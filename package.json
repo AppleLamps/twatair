@@ -7,7 +7,6 @@
     "scripts": {
         "dev": "python -m http.server 8000",
         "vercel-dev": "vercel dev",
-        "build": "echo 'No build step required'",
         "deploy": "vercel --prod"
     },
     "keywords": [
@@ -19,7 +18,7 @@
     "author": "",
     "license": "MIT",
     "engines": {
-        "node": ">=18.x"
+        "node": "18.x"
     },
     "dependencies": {}
 }
