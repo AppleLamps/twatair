@@ -1,0 +1,25 @@
+{
+    "name": "twatair",
+    "version": "1.0.0",
+    "description": "TwatAir - The airline parody website with $TWATAIR meme coin integration",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "python -m http.server 8000",
+        "vercel-dev": "vercel dev",
+        "build": "echo 'No build step required'",
+        "deploy": "vercel --prod"
+    },
+    "keywords": [
+        "twatair",
+        "meme-coin",
+        "solana",
+        "bags-fm"
+    ],
+    "author": "",
+    "license": "MIT",
+    "engines": {
+        "node": ">=18.x"
+    },
+    "dependencies": {}
+}

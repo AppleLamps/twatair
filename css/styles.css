@@ -1,0 +1,1588 @@
+/* TwatAir CSS Framework - Brutally Satirical Ryanair Parody */
+
+/* CSS Variables for Brand Colors */
+:root {
+    --ryanair-yellow: #FFCC00;
+    --ryanair-blue: #003087;
+    --ryanair-dark-blue: #001B4A;
+    --warning-red: #FF0000;
+    --success-green: #00AA00;
+    --text-dark: #333;
+    --text-light: #FFF;
+    --surface: #FFFFFF;
+    --surface-muted: #F4F6FB;
+    --surface-accent: #FFF6CC;
+    --border-subtle: rgba(0, 48, 135, 0.18);
+    --shadow: rgba(0, 0, 0, 0.1);
+    --shadow-strong: rgba(0, 0, 0, 0.18);
+    --border-radius: 4px;
+    --radius-md: 10px;
+    --transition: all 0.3s ease;
+}
+
+/* Base Reset and Typography */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+body {
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-weight: 400;
+    color: var(--text-dark);
+    background-color: var(--surface-muted);
+    background-image: linear-gradient(180deg, #FFFFFF 0%, #F4F6FB 100%);
+    overflow-x: hidden;
+}
+
+main {
+    padding: 40px 0 60px;
+}
+
+/* Typography Hierarchy */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 1.2;
+    color: var(--ryanair-blue);
+}
+
+h1 {
+    font-size: clamp(2rem, 5vw, 4rem);
+    margin-bottom: 1rem;
+}
+
+h2 {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    margin-bottom: 0.8rem;
+}
+
+h3 {
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    margin-bottom: 0.6rem;
+}
+
+p {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    line-height: 1.65;
+}
+
+strong, b {
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Links */
+a {
+    color: var(--ryanair-blue);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+a:hover {
+    color: var(--ryanair-yellow);
+    text-decoration: underline;
+}
+
+/* Buttons - Urgent CTA Style */
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: var(--ryanair-yellow);
+    color: var(--ryanair-blue);
+    font-weight: 900;
+    font-size: 1rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 3px solid var(--ryanair-blue);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    letter-spacing: 1px;
+}
+
+button.btn {
+    font-family: inherit;
+}
+
+.btn:hover {
+    background-color: var(--ryanair-blue);
+    color: var(--ryanair-yellow);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.btn:focus-visible,
+.nav-toggle:focus-visible,
+.nav-menu li a:focus-visible,
+a:focus-visible {
+    outline: 3px solid var(--ryanair-yellow);
+    outline-offset: 2px;
+}
+
+.btn-primary {
+    background-color: var(--ryanair-yellow);
+    border-color: var(--ryanair-blue);
+    color: var(--ryanair-blue);
+}
+
+.btn-danger {
+    background-color: var(--warning-red);
+    border-color: var(--warning-red);
+    color: var(--text-light);
+}
+
+.btn-danger:hover {
+    background-color: #CC0000;
+    border-color: #CC0000;
+}
+
+.btn-success {
+    background-color: var(--success-green);
+    border-color: var(--success-green);
+    color: var(--text-light);
+}
+
+.btn-success:hover {
+    background-color: #008800;
+    border-color: #008800;
+}
+
+/* Icon inside buttons */
+.btn svg {
+    vertical-align: middle;
+    margin-right: 6px;
+    flex-shrink: 0;
+}
+
+.btn-success svg {
+    stroke: currentColor;
+}
+
+/* Warnings and Alerts */
+.warning {
+    background-color: var(--warning-red);
+    color: var(--text-light);
+    padding: 16px;
+    border-radius: var(--border-radius);
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    border: 3px solid #CC0000;
+    animation: flash 2s infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes flash {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.8; }
+}
+
+.alert {
+    background-color: var(--ryanair-yellow);
+    color: var(--ryanair-blue);
+    padding: 12px;
+    border-radius: var(--border-radius);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    border: 2px solid var(--ryanair-blue);
+}
+
+.success {
+    background-color: var(--success-green);
+    color: var(--text-light);
+    padding: 12px;
+    border-radius: var(--border-radius);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+/* Container and Layout */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.grid {
+    display: grid;
+    gap: 20px;
+}
+
+.grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.grid-4 {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.flex {
+    display: flex;
+    gap: 20px;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.flex-center {
+    justify-content: center;
+    align-items: center;
+}
+
+.space-between {
+    justify-content: space-between;
+}
+
+.space-around {
+    justify-content: space-around;
+}
+
+/* Cards */
+.card {
+    background-color: var(--text-light);
+    border: 3px solid var(--ryanair-blue);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: 0 4px 8px var(--shadow);
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px var(--shadow);
+}
+
+.card-header {
+    background-color: var(--ryanair-yellow);
+    color: var(--ryanair-blue);
+    padding: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: -20px -20px 20px -20px;
+    border-bottom: 3px solid var(--ryanair-blue);
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: var(--ryanair-blue);
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--ryanair-blue);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background-color: var(--text-light);
+    transition: var(--transition);
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--ryanair-yellow);
+    box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.3);
+}
+
+input.error, select.error, textarea.error {
+    border-color: var(--warning-red);
+    box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.3);
+}
+
+input[type="checkbox"], input[type="radio"] {
+    width: auto;
+    margin-right: 8px;
+}
+
+/* Header and Hero */
+.header {
+    background-color: var(--surface);
+    border-bottom: 3px solid var(--ryanair-blue);
+    box-shadow: 0 10px 20px var(--shadow);
+    position: relative;
+    z-index: 10;
+}
+
+.top-bar {
+    background-color: var(--ryanair-yellow);
+    color: var(--ryanair-blue);
+    text-align: center;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 6px 12px;
+}
+
+.slogan {
+    font-size: 0.9rem;
+}
+
+.header-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 14px 0;
+}
+
+/* Icon utility class */
+.icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.icon svg {
+    display: block;
+}
+
+.logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: 900;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    flex-shrink: 0;
+    margin-left: 4px;
+}
+
+.logo:hover {
+    text-decoration: none;
+}
+
+.logo-text {
+    color: var(--ryanair-blue);
+}
+
+.logo-icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--ryanair-blue);
+}
+
+.logo-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.hero {
+    background: linear-gradient(135deg, #FFFFFF 0%, #FFF6CC 100%);
+    border-bottom: 3px solid var(--ryanair-blue);
+    padding: 40px 0;
+}
+
+.hero-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 32px;
+    align-items: center;
+}
+
+.hero-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.hero-subheadline {
+    font-size: 1.1rem;
+    max-width: 54ch;
+}
+
+.hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.hero-warning {
+    animation: none;
+    background-color: var(--ryanair-dark-blue);
+    color: var(--ryanair-yellow);
+    border-color: var(--ryanair-yellow);
+    text-transform: none;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.hero-warning svg {
+    flex-shrink: 0;
+}
+
+.hero-visual {
+    display: flex;
+    justify-content: center;
+}
+
+.booking-preview {
+    width: 100%;
+    max-width: 420px;
+}
+
+.flight-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background-color: var(--surface-muted);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+}
+
+.flight-info .route {
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.flight-info .date {
+    font-weight: 700;
+    color: var(--ryanair-dark-blue);
+}
+
+.flight-info .price {
+    font-weight: 900;
+    color: var(--warning-red);
+    font-size: 1.2rem;
+}
+
+.fees-preview {
+    display: grid;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 2px dashed var(--border-subtle);
+}
+
+.fees-preview .fee-item {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+}
+
+.fees-preview .fee-item.total {
+    font-size: 1.1rem;
+    color: var(--warning-red);
+}
+
+.pay-with-coin {
+    margin-top: 12px;
+    text-align: center;
+    background-color: var(--surface-accent);
+    padding: 12px;
+    border-radius: var(--radius-md);
+    border: 2px dashed var(--ryanair-blue);
+}
+
+/* Booking Widget */
+.booking-widget {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.progress-indicator {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.progress-step {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 3px solid var(--ryanair-blue);
+    color: var(--ryanair-blue);
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    background-color: var(--surface);
+}
+
+.progress-step.active {
+    background-color: var(--ryanair-yellow);
+}
+
+.progress-step.completed {
+    background-color: var(--success-green);
+    color: var(--text-light);
+    border-color: var(--success-green);
+}
+
+.booking-step {
+    background-color: var(--surface);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.extras-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.extra-item {
+    background-color: var(--surface-muted);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px;
+}
+
+.price-summary {
+    background-color: var(--surface-muted);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: grid;
+    gap: 10px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+}
+
+.summary-row.total {
+    font-size: 1.1rem;
+    color: var(--warning-red);
+}
+
+.payment-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.payment-option {
+    background-color: var(--surface);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px;
+}
+
+.booking-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+/* Fee Calculator */
+.fee-calculator {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.calculator-header {
+    background-color: var(--surface-accent);
+    border: 2px solid var(--ryanair-blue);
+    border-radius: var(--radius-md);
+    padding: 16px;
+}
+
+.fee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.fee-grid .fee-item {
+    background-color: var(--surface);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px;
+}
+
+.total-display {
+    background-color: var(--ryanair-dark-blue);
+    color: var(--text-light);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    border: 3px solid var(--ryanair-yellow);
+}
+
+.total-header {
+    text-transform: uppercase;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.total-amount {
+    font-size: 2rem;
+    font-weight: 900;
+    margin: 8px 0;
+}
+
+.calculator-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.disclaimer {
+    background-color: var(--surface-muted);
+    border: 2px dashed var(--ryanair-blue);
+    border-radius: var(--radius-md);
+    padding: 16px;
+}
+
+.alert-info {
+    background-color: var(--ryanair-blue);
+    color: var(--text-light);
+    border: 2px solid var(--ryanair-yellow);
+}
+
+/* Destinations */
+.destinations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.destination-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.destination-price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.price-label {
+    font-weight: 900;
+}
+
+.price-amount {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--warning-red);
+}
+
+.destination-insults {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.insult-tag {
+    background-color: var(--ryanair-blue);
+    color: var(--text-light);
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* Coin Page */
+.coin-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.coin-hero {
+    background: linear-gradient(135deg, #FFFFFF 0%, #F4F6FB 100%);
+    border: 3px solid var(--ryanair-blue);
+    border-radius: var(--radius-md);
+    padding: 20px;
+}
+
+.coin-header {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.coin-logo {
+    font-size: 2rem;
+}
+
+.coin-price-display {
+    margin: 16px 0;
+}
+
+.current-price {
+    display: grid;
+    gap: 6px;
+    background-color: var(--surface-accent);
+    border: 2px solid var(--ryanair-blue);
+    border-radius: var(--radius-md);
+    padding: 12px;
+}
+
+.price-label {
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.price-value {
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+.price-change {
+    font-weight: 900;
+}
+
+.price-change.positive {
+    color: var(--success-green);
+}
+
+.price-change.negative {
+    color: var(--warning-red);
+}
+
+.coin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.token-address {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: var(--surface-muted);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.address-label {
+    font-weight: 900;
+    font-size: 0.8rem;
+    color: var(--ryanair-dark-blue);
+    text-transform: uppercase;
+}
+
+.address-value {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    color: var(--ryanair-blue);
+    background-color: var(--surface);
+    padding: 6px 10px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-subtle);
+    word-break: break-all;
+    flex: 1;
+    min-width: 200px;
+}
+
+.copy-btn {
+    background-color: var(--ryanair-blue);
+    color: var(--text-light);
+    border: none;
+    padding: 6px 12px;
+    border-radius: var(--border-radius);
+    font-weight: 700;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.copy-btn:hover {
+    background-color: var(--ryanair-dark-blue);
+}
+
+.copy-btn.copied {
+    background-color: var(--success-green);
+}
+
+.community-link-primary {
+    background-color: var(--ryanair-yellow) !important;
+    border-color: var(--ryanair-blue) !important;
+    font-weight: 900;
+}
+
+.community-link-primary:hover {
+    background-color: var(--ryanair-blue) !important;
+    color: var(--ryanair-yellow) !important;
+}
+
+.community-icon {
+    font-weight: 900;
+    font-size: 0.75rem;
+    min-width: 32px;
+    text-align: center;
+}
+
+/* API Status Indicator */
+.api-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.api-status.live {
+    background-color: var(--success-green);
+    color: var(--text-light);
+}
+
+.api-status.demo {
+    background-color: var(--ryanair-yellow);
+    color: var(--ryanair-blue);
+}
+
+.coin-chart .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.chart-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.chart-btn {
+    background-color: var(--surface);
+    border: 2px solid var(--ryanair-blue);
+    border-radius: var(--border-radius);
+    padding: 6px 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.chart-btn.active {
+    background-color: var(--ryanair-yellow);
+}
+
+.ascii-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 180px;
+    background-color: var(--surface-muted);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px;
+}
+
+.chart-bar {
+    flex: 1;
+    background-color: var(--ryanair-blue);
+    border-radius: 6px 6px 0 0;
+    position: relative;
+}
+
+.bar-value {
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ryanair-dark-blue);
+    color: var(--text-light);
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    opacity: 0;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.chart-bar:hover .bar-value {
+    opacity: 1;
+}
+
+.chart-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--ryanair-dark-blue);
+    margin-top: 8px;
+}
+
+.coin-stats .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.stat-item,
+.stat-card {
+    background-color: var(--surface);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px;
+}
+
+.stat-label {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--ryanair-dark-blue);
+}
+
+.stat-value {
+    font-weight: 900;
+    font-size: 1.4rem;
+}
+
+.coin-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.feature {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background-color: var(--surface-muted);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 12px;
+}
+
+.feature-icon {
+    font-size: 1.4rem;
+}
+
+.roadmap-timeline {
+    display: grid;
+    gap: 12px;
+}
+
+.roadmap-item {
+    border-left: 4px solid var(--ryanair-blue);
+    padding-left: 12px;
+}
+
+.roadmap-item.completed {
+    border-left-color: var(--success-green);
+}
+
+.roadmap-item.active {
+    border-left-color: var(--ryanair-yellow);
+}
+
+.community-links {
+    display: grid;
+    gap: 10px;
+}
+
+.community-link {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background-color: var(--surface);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+}
+
+.community-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.community-stat {
+    background-color: var(--surface-muted);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    text-align: center;
+}
+
+.stat-number {
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: var(--ryanair-blue);
+}
+
+.coin-disclaimer {
+    border: 2px dashed var(--warning-red);
+    background-color: #FFF0F0;
+}
+
+/* About Page */
+.about-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.about-hero {
+    background: linear-gradient(135deg, #FFFFFF 0%, #F4F6FB 100%);
+    border: 3px solid var(--ryanair-blue);
+    border-radius: var(--radius-md);
+    padding: 20px;
+}
+
+.about-tagline {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.about-intro {
+    max-width: 70ch;
+}
+
+.timeline-container {
+    display: grid;
+    gap: 16px;
+}
+
+.timeline-item .timeline-content {
+    position: relative;
+}
+
+.timeline-year {
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: var(--ryanair-blue);
+}
+
+.timeline-image {
+    font-size: 1.6rem;
+    margin: 6px 0;
+}
+
+.elon-quote {
+    background-color: var(--surface-accent);
+    border-left: 4px solid var(--ryanair-blue);
+    padding: 10px 12px;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+.mission-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    align-items: center;
+}
+
+.mission-image {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.cta-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* Contact Page */
+.contact-form-container {
+    display: grid;
+    gap: 20px;
+}
+
+.form-section {
+    border-top: 2px solid var(--border-subtle);
+    padding-top: 16px;
+    margin-top: 16px;
+}
+
+.form-section:first-of-type {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.contact-response {
+    min-height: 40px;
+}
+
+.contact-methods {
+    display: grid;
+    gap: 12px;
+}
+
+/* Tables */
+/* Tables */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.table th,
+.table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--ryanair-blue);
+}
+
+.table th {
+    background-color: var(--ryanair-yellow);
+    color: var(--ryanair-blue);
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.fade-in {
+    animation: slideIn 0.6s ease-out;
+}
+
+.bounce {
+    animation: bounce 1s infinite;
+}
+
+/* Fee explosion animation */
+.fee-explosion {
+    animation: feeExplosion 0.5s ease-out;
+}
+
+@keyframes feeExplosion {
+    0% {
+        transform: scale(1);
+        color: var(--text-dark);
+    }
+    50% {
+        transform: scale(1.2);
+        color: var(--warning-red);
+    }
+    100% {
+        transform: scale(1);
+        color: var(--warning-red);
+    }
+}
+
+/* Price ticker animation */
+.price-pump {
+    animation: pricePump 0.8s ease-out;
+}
+
+@keyframes pricePump {
+    0% {
+        transform: scale(1);
+        color: var(--success-green);
+    }
+    25% {
+        transform: scale(1.1);
+        color: var(--ryanair-yellow);
+    }
+    50% {
+        transform: scale(1.2);
+        color: var(--warning-red);
+    }
+    75% {
+        transform: scale(1.1);
+        color: var(--ryanair-yellow);
+    }
+    100% {
+        transform: scale(1);
+        color: var(--success-green);
+    }
+}
+
+/* Responsive Design - Mobile First */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        grid-template-columns: 1fr;
+    }
+
+    .flex {
+        flex-direction: column;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    h2 {
+        font-size: 2rem;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .card {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    html {
+        font-size: 14px;
+    }
+
+    .warning {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+}
+
+/* Navigation specific styles */
+.nav-toggle {
+    display: none;
+    background: var(--surface);
+    border: 2px solid var(--ryanair-blue);
+    cursor: pointer;
+    color: var(--ryanair-blue);
+    padding: 8px;
+    border-radius: var(--border-radius);
+    line-height: 0;
+}
+
+.nav-toggle svg {
+    width: 24px;
+    height: 24px;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 4px;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-menu li {
+    flex-shrink: 0;
+}
+
+.nav-menu li a {
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--ryanair-blue);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.nav-menu li a:hover {
+    text-decoration: none;
+}
+
+.nav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+}
+
+.nav-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.nav-text {
+    line-height: 1;
+}
+
+.nav-menu li a:hover,
+.nav-menu li a.active {
+    background-color: var(--ryanair-blue);
+    color: var(--text-light);
+}
+
+@media (max-width: 900px) {
+    .nav-menu li a {
+        padding: 8px 10px;
+        font-size: 0.7rem;
+    }
+    
+    .nav-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-menu {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: var(--text-light);
+        border: 2px solid var(--ryanair-blue);
+        border-top: none;
+        padding: 16px;
+        gap: 4px;
+        z-index: 100;
+        box-shadow: 0 10px 30px var(--shadow-strong);
+    }
+
+    .nav-menu.open {
+        display: flex;
+    }
+    
+    .nav-menu li {
+        width: 100%;
+    }
+    
+    .nav-menu li a {
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 12px 16px;
+        font-size: 0.85rem;
+        width: 100%;
+    }
+}
+
+/* Footer styles */
+.footer {
+    background-color: var(--ryanair-blue);
+    color: var(--text-light);
+    padding: 40px 0 20px;
+    margin-top: 40px;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.footer-section h3 {
+    color: var(--ryanair-yellow);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: 8px;
+}
+
+.footer-section ul li a {
+    color: var(--text-light);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-section ul li a:hover {
+    color: var(--ryanair-yellow);
+}
+
+.footer-section ul li a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.footer-icon {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.footer-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.footer-bottom {
+    border-top: 1px solid var(--ryanair-yellow);
+    padding-top: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+/* Crypto ticker styles */
+.crypto-ticker {
+    background-color: var(--ryanair-blue);
+    color: var(--text-light);
+    padding: 8px 0;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    overflow: hidden;
+}
+
+.ticker-content {
+    display: flex;
+    animation: tickerScroll 20s linear infinite;
+}
+
+@keyframes tickerScroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+.ticker-item {
+    white-space: nowrap;
+    margin-right: 40px;
+    color: var(--ryanair-yellow);
+}
+
+.ticker-item.positive {
+    color: var(--success-green);
+}
+
+.ticker-item.negative {
+    color: var(--warning-red);
+}
+
+/* Utility classes */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.hidden { display: none; }
+.block { display: block; }
+.inline-block { display: inline-block; }
+.flex { display: flex; }
+.grid { display: grid; }
+
+/* Icon sizing utilities */
+.icon-sm svg { width: 14px; height: 14px; }
+.icon-md svg { width: 18px; height: 18px; }
+.icon-lg svg { width: 24px; height: 24px; }
+.icon-xl svg { width: 32px; height: 32px; }
+
+@media (max-width: 900px) {
+    .hero-container {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-visual {
+        justify-content: flex-start;
+    }
+
+    .coin-chart .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+}
