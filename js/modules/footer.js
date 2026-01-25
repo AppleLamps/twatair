@@ -1,24 +1,20 @@
 /**
  * TwatAir Footer Module
- * Creates and manages the site footer with crypto ticker and links
+ * Creates and manages the site footer with links
  */
 
-import { dom, format, random } from './utils.js';
-import { cryptoTicker } from './cryptoTicker.js';
+import { dom, random } from './utils.js';
 import { icons } from './icons.js';
 import { TOKEN_CONFIG } from './tokenApi.js';
 
 export class Footer {
-    constructor() {
-        this.cryptoTicker = cryptoTicker;
-    }
+    constructor() {}
 
     /**
      * Initialize footer
      */
     async init() {
         await this.createFooter();
-        this.cryptoTicker.init();
     }
 
     /**
@@ -29,10 +25,6 @@ export class Footer {
         if (!footerContainer) return;
 
         const footer = dom.create('footer', { className: 'footer' });
-
-        // Crypto ticker (will be populated by CryptoTicker)
-        const ticker = dom.create('div', { id: 'crypto-ticker' });
-        footer.appendChild(ticker);
 
         // Main footer content
         const footerContent = dom.create('div', { className: 'footer-content container' });

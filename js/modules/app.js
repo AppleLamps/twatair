@@ -5,6 +5,7 @@
 
 import { header } from './header.js';
 import { footer } from './footer.js';
+import { toast } from './toast.js';
 
 // Global app configuration
 const CONFIG = {
@@ -45,26 +46,44 @@ export class TwatAirApp {
 
             this.initialized = true;
 
+            // Signal that app is ready - triggers smooth fade-in
+            this.signalReady();
+
         } catch (error) {
             console.error('💥 TwatAir initialization failed:', error);
             this.showErrorMessage();
+            // Still show the page even on error
+            this.signalReady();
         }
     }
 
     /**
-     * Initialize core modules (header, footer, nav)
+     * Signal that the app is ready and trigger fade-in
+     */
+    signalReady() {
+        // Use requestAnimationFrame to ensure styles are applied before transition
+        requestAnimationFrame(() => {
+            document.body.classList.add('app-ready');
+        });
+    }
+
+    /**
+     * Initialize core modules (header, footer, nav, toast)
      */
     async initCoreModules() {
+        // Initialize toast notification system
+        toast.init();
+
         // Initialize header (includes navigation)
         await header.init();
 
-        // Initialize footer (includes crypto ticker)
+        // Initialize footer
         await footer.init();
 
         // Store module references
         this.modules.set('header', header);
         this.modules.set('footer', footer);
-        this.modules.set('cryptoTicker', footer.cryptoTicker);
+        this.modules.set('toast', toast);
     }
 
     /**
@@ -197,23 +216,6 @@ export class TwatAirApp {
             }
         });
 
-        // Handle page visibility changes (for crypto ticker)
-        document.addEventListener('visibilitychange', () => {
-            try {
-                const cryptoTicker = this.modules.get('cryptoTicker');
-                if (!cryptoTicker) return;
-
-                if (document.hidden) {
-                    if (typeof cryptoTicker.stopUpdates === 'function') {
-                        cryptoTicker.stopUpdates();
-                    }
-                } else if (typeof cryptoTicker.resume === 'function') {
-                    cryptoTicker.resume();
-                }
-            } catch (e) {
-                // Silently fail if crypto ticker is not available
-            }
-        });
     }
 
     /**
@@ -300,6 +302,14 @@ export class TwatAirApp {
 // Create and initialize the app
 const app = new TwatAirApp();
 
+// Prevent browser from restoring scroll position - causes "jumping"
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+
+// Reset scroll position on page load
+window.scrollTo(0, 0);
+
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
@@ -315,3 +325,4 @@ if (document.readyState === 'loading') {
 
 // Export for debugging/console access
 window.TwatAir = app;
+window.toast = toast;

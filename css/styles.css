@@ -18,6 +18,66 @@
     --border-radius: 4px;
     --radius-md: 10px;
     --transition: all 0.3s ease;
+    
+    /* Layout reservations to prevent CLS */
+    --header-height: 110px;
+    --footer-min-height: 280px;
+}
+
+/* ==========================================================================
+   ANTI-FLASH / SMOOTH PAGE TRANSITIONS
+   Prevents layout shift and flash during page load
+   ========================================================================== */
+
+/* Hide body until JS initializes - prevents flash */
+body:not(.app-ready) {
+    opacity: 0;
+    animation: safetyFadeIn 0.3s ease-out 0.1s forwards;
+}
+
+/* Smooth fade-in when app is ready */
+body.app-ready {
+    opacity: 1;
+    transition: opacity 0.15s ease-out;
+    animation: none;
+}
+
+/* Safety fallback: ensure content shows even if JS is slow/fails */
+@keyframes safetyFadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Reserve space for header to prevent layout shift */
+#header-container {
+    min-height: var(--header-height);
+    background-color: var(--surface);
+}
+
+/* Reserve space for footer to prevent layout shift */
+#footer-container {
+    min-height: var(--footer-min-height);
+    background-color: var(--ryanair-blue);
+}
+
+/* After content loads, use actual content height but maintain stability */
+#header-container:has(.header) {
+    min-height: auto;
+}
+
+#footer-container:has(.footer) {
+    min-height: auto;
+}
+
+/* Fallback font-face to reduce font swap flash */
+@font-face {
+    font-family: 'Montserrat-Fallback';
+    src: local('Arial');
+    ascent-override: 91%;
+    descent-override: 26%;
+    line-gap-override: 0%;
+    size-adjust: 108%;
 }
 
 /* Base Reset and Typography */
@@ -30,10 +90,12 @@
 html {
     font-size: 16px;
     line-height: 1.5;
+    /* Smooth scrolling for anchor links */
+    scroll-behavior: smooth;
 }
 
 body {
-    font-family: 'Montserrat', Arial, sans-serif;
+    font-family: 'Montserrat', 'Montserrat-Fallback', Arial, sans-serif;
     font-weight: 400;
     color: var(--text-dark);
     background-color: var(--surface-muted);
@@ -187,8 +249,8 @@ a:focus-visible {
 }
 
 @keyframes flash {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0.8; }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
 }
 
 .alert {
@@ -339,10 +401,14 @@ input[type="checkbox"], input[type="radio"] {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 6px 12px;
+    min-height: 32px;
 }
 
 .slogan {
     font-size: 0.9rem;
+    transition: opacity 0.3s ease;
+    min-height: 1.2em;
+    will-change: opacity;
 }
 
 .header-main {
@@ -1513,11 +1579,14 @@ input[type="checkbox"], input[type="radio"] {
     text-transform: uppercase;
     font-size: 0.9rem;
     overflow: hidden;
+    min-height: 36px;
+    contain: layout;
 }
 
 .ticker-content {
     display: flex;
     animation: tickerScroll 20s linear infinite;
+    will-change: transform;
 }
 
 @keyframes tickerScroll {
@@ -1529,6 +1598,7 @@ input[type="checkbox"], input[type="radio"] {
     white-space: nowrap;
     margin-right: 40px;
     color: var(--ryanair-yellow);
+    min-width: 200px;
 }
 
 .ticker-item.positive {
@@ -1584,5 +1654,565 @@ input[type="checkbox"], input[type="radio"] {
         animation-iteration-count: 1 !important;
         transition-duration: 0.001ms !important;
         scroll-behavior: auto !important;
+    }
+}
+
+/* ==========================================================================
+   TOAST NOTIFICATION SYSTEM
+   ========================================================================== */
+
+.toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 300px;
+    max-width: 420px;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    border: 3px solid;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    pointer-events: auto;
+    transform: translateX(120%);
+    opacity: 0;
+    animation: toastSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.toast.toast--exiting {
+    animation: toastSlideOut 0.3s ease-in forwards;
+}
+
+.toast--success {
+    background-color: #E8F5E9;
+    border-color: var(--success-green);
+    color: #1B5E20;
+}
+
+.toast--error {
+    background-color: #FFEBEE;
+    border-color: var(--warning-red);
+    color: #B71C1C;
+}
+
+.toast--warning {
+    background-color: #FFF8E1;
+    border-color: #F9A825;
+    color: #E65100;
+}
+
+.toast--info {
+    background-color: #E3F2FD;
+    border-color: var(--ryanair-blue);
+    color: var(--ryanair-dark-blue);
+}
+
+.toast__icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.toast__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast__title {
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.toast__message {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.toast__close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.toast__close:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.toast__progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background-color: currentColor;
+    opacity: 0.3;
+    border-radius: 0 0 0 var(--radius-md);
+    animation: toastProgress 4s linear forwards;
+}
+
+@keyframes toastSlideIn {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes toastSlideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
+
+@keyframes toastProgress {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* Mobile toast - slides from bottom */
+@media (max-width: 480px) {
+    .toast-container {
+        bottom: 16px;
+        left: 16px;
+        right: 16px;
+    }
+
+    .toast {
+        min-width: auto;
+        max-width: none;
+        transform: translateY(120%);
+    }
+
+    @keyframes toastSlideIn {
+        from {
+            transform: translateY(120%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes toastSlideOut {
+        from {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateY(120%);
+            opacity: 0;
+        }
+    }
+}
+
+/* ==========================================================================
+   MOBILE MENU BACKDROP & ANIMATIONS
+   ========================================================================== */
+
+.nav-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 48, 135, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 99;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.nav-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.nav-toggle {
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.nav-toggle.active {
+    transform: rotate(90deg);
+    background-color: var(--ryanair-yellow);
+}
+
+body.menu-open {
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .nav-menu li {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    .nav-menu.open li {
+        animation: menuItemSlideIn 0.3s ease forwards;
+    }
+
+    .nav-menu.open li:nth-child(1) { animation-delay: 0.05s; }
+    .nav-menu.open li:nth-child(2) { animation-delay: 0.1s; }
+    .nav-menu.open li:nth-child(3) { animation-delay: 0.15s; }
+    .nav-menu.open li:nth-child(4) { animation-delay: 0.2s; }
+    .nav-menu.open li:nth-child(5) { animation-delay: 0.25s; }
+    .nav-menu.open li:nth-child(6) { animation-delay: 0.3s; }
+    .nav-menu.open li:nth-child(7) { animation-delay: 0.35s; }
+}
+
+@keyframes menuItemSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ==========================================================================
+   ENHANCED BUTTON HOVER EFFECTS
+   ========================================================================== */
+
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+}
+
+.btn:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+.btn:hover {
+    box-shadow: 0 6px 20px rgba(0, 48, 135, 0.3);
+}
+
+.btn-success:hover {
+    box-shadow: 0 6px 20px rgba(0, 170, 0, 0.4);
+}
+
+.btn-danger:hover {
+    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   ENHANCED CARD HOVER EFFECTS
+   ========================================================================== */
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 32px var(--shadow-strong);
+    border-color: var(--ryanair-yellow);
+}
+
+.card:hover .card-header {
+    background-color: var(--ryanair-blue);
+    color: var(--ryanair-yellow);
+}
+
+.card-header {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Destination card enhancements */
+.destination-card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+.destination-card:hover .price-amount {
+    animation: priceBounce 0.5s ease;
+}
+
+@keyframes priceBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+/* Stat card enhancements */
+.stat-item:hover .stat-value,
+.stat-card:hover .stat-value {
+    transform: scale(1.1);
+    color: var(--ryanair-blue);
+}
+
+.stat-value {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* ==========================================================================
+   NAV LINK UNDERLINE ANIMATION
+   ========================================================================== */
+
+.nav-menu li a {
+    position: relative;
+}
+
+.nav-menu li a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    background-color: var(--ryanair-yellow);
+    transition: width 0.3s ease, left 0.3s ease;
+}
+
+.nav-menu li a:hover::before,
+.nav-menu li a.active::before {
+    width: 100%;
+    left: 0;
+}
+
+@media (max-width: 768px) {
+    .nav-menu li a::before {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   BETTER FORM ERROR DISPLAY
+   ========================================================================== */
+
+.form-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    margin-top: 8px;
+    background-color: #FFEBEE;
+    border: 2px solid var(--warning-red);
+    border-radius: var(--border-radius);
+    color: #B71C1C;
+    font-weight: 700;
+    font-size: 0.9rem;
+    animation: errorShake 0.4s ease;
+}
+
+.form-error__message {
+    flex: 1;
+}
+
+.form-error__close {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    padding: 0;
+    line-height: 1;
+    color: inherit;
+}
+
+.form-error__close:hover {
+    opacity: 1;
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+}
+
+input.error,
+select.error,
+textarea.error {
+    border-color: var(--warning-red);
+    animation: inputErrorPulse 2s ease infinite;
+}
+
+@keyframes inputErrorPulse {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2); }
+    50% { box-shadow: 0 0 0 4px rgba(255, 0, 0, 0.3); }
+}
+
+/* ==========================================================================
+   LOADING STATES - SKELETONS & SPINNERS
+   ========================================================================== */
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--surface-muted) 25%,
+        #E8EBF2 50%,
+        var(--surface-muted) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s ease infinite;
+    border-radius: var(--border-radius);
+}
+
+.skeleton-text {
+    height: 1em;
+    margin-bottom: 0.5em;
+}
+
+.skeleton-title {
+    height: 1.5em;
+    width: 60%;
+    margin-bottom: 1em;
+}
+
+.skeleton-card {
+    height: 200px;
+}
+
+@keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--border-subtle);
+    border-top-color: var(--ryanair-blue);
+    border-radius: 50%;
+    animation: spinnerRotate 0.8s linear infinite;
+}
+
+.spinner--small {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+
+.spinner--large {
+    width: 40px;
+    height: 40px;
+    border-width: 4px;
+}
+
+@keyframes spinnerRotate {
+    to { transform: rotate(360deg); }
+}
+
+.btn--loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn--loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spinnerRotate 0.8s linear infinite;
+}
+
+.btn--loading::after {
+    display: none;
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: inherit;
+}
+
+/* Reduced motion - disable loading animations */
+@media (prefers-reduced-motion: reduce) {
+    .skeleton {
+        animation: none;
+        background: var(--surface-muted);
+    }
+
+    .spinner {
+        animation: none;
+        border-top-color: var(--ryanair-blue);
+        opacity: 0.5;
+    }
+
+    .toast {
+        animation: none;
+        transform: none;
+        opacity: 1;
+    }
+
+    .toast.toast--exiting {
+        animation: none;
+        opacity: 0;
+    }
+
+    .nav-menu.open li {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+
+    .form-error {
+        animation: none;
+    }
+
+    input.error,
+    select.error,
+    textarea.error {
+        animation: none;
     }
 }

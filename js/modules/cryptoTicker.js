@@ -125,6 +125,10 @@ export class CryptoTicker {
             // Special handling for different coins
             switch (coin.symbol) {
                 case '$TWATAIR':
+                    // If we have real data from API, don't override with random
+                    if (coin.isReal) {
+                        return; // Keep the real price
+                    }
                     // Volatile meme coin - big pumps and dumps
                     const pumpChance = Math.random();
                     if (pumpChance < 0.1) {
@@ -213,6 +217,25 @@ export class CryptoTicker {
     getTwatAirPrice() {
         const twatAir = this.tickerData.find(coin => coin.symbol === '$TWATAIR');
         return twatAir ? twatAir.price : 0;
+    }
+    
+    /**
+     * Set TWATAIR price from API (real data)
+     * @param {number} price - Real price from API
+     * @param {number} change - Price change percentage
+     */
+    setTwatAirPrice(price, change = 0) {
+        const twatAir = this.tickerData.find(coin => coin.symbol === '$TWATAIR');
+        if (twatAir && price > 0) {
+            twatAir.price = price;
+            twatAir.change = change;
+            twatAir.isReal = true; // Flag to prevent random updates
+            
+            // Update display
+            if (this.content) {
+                this.updateTickerContent(this.content);
+            }
+        }
     }
 
     /**

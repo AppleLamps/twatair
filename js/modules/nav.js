@@ -18,6 +18,7 @@ export class Navigation {
             { href: 'contact.html', text: 'CONTACT', icon: 'phone' }
         ];
         this.isOpen = false;
+        this.backdrop = null;
     }
 
     /**
@@ -36,13 +37,18 @@ export class Navigation {
         const navContainer = dom.get('#nav-container');
         if (!navContainer) return;
 
+        // Create backdrop for mobile menu
+        this.backdrop = dom.create('div', { className: 'nav-backdrop' });
+        document.body.appendChild(this.backdrop);
+
         // Create nav wrapper
         const nav = dom.create('nav', { className: 'nav' });
 
         // Create mobile toggle button
         const toggleBtn = dom.create('button', {
             className: 'nav-toggle',
-            'aria-label': 'Toggle navigation menu'
+            'aria-label': 'Toggle navigation menu',
+            'aria-expanded': 'false'
         });
         toggleBtn.innerHTML = icons.menu;
 
@@ -53,19 +59,19 @@ export class Navigation {
         this.navData.forEach(item => {
             const li = dom.create('li');
             const a = dom.create('a', { href: item.href });
-            
+
             // Add icon
             const iconSpan = dom.create('span', { className: 'nav-icon' });
             iconSpan.innerHTML = icons[item.icon] || '';
             a.appendChild(iconSpan);
-            
+
             // Add text
-            const textSpan = dom.create('span', { 
+            const textSpan = dom.create('span', {
                 className: 'nav-text',
-                textContent: item.text 
+                textContent: item.text
             });
             a.appendChild(textSpan);
-            
+
             li.appendChild(a);
             menu.appendChild(li);
         });
@@ -87,9 +93,12 @@ export class Navigation {
         // Mobile menu toggle
         dom.on(this.toggleBtn, 'click', () => this.toggleMenu());
 
+        // Close menu when clicking backdrop
+        dom.on(this.backdrop, 'click', () => this.closeMenu());
+
         // Close menu when clicking outside
         dom.on(document, 'click', (e) => {
-            if (!this.nav.contains(e.target) && this.isOpen) {
+            if (!this.nav.contains(e.target) && !this.backdrop.contains(e.target) && this.isOpen) {
                 this.closeMenu();
             }
         }, { passive: true });
@@ -100,6 +109,13 @@ export class Navigation {
                 this.closeMenu();
             }
         }, { passive: true });
+
+        // Close menu on Escape key
+        dom.on(document, 'keydown', (e) => {
+            if (e.key === 'Escape' && this.isOpen) {
+                this.closeMenu();
+            }
+        });
 
         // Handle navigation clicks
         dom.on(this.menu, 'click', (e) => {
@@ -115,9 +131,13 @@ export class Navigation {
     toggleMenu() {
         this.isOpen = !this.isOpen;
         dom.toggleClass(this.menu, 'open');
+        dom.toggleClass(this.toggleBtn, 'active');
+        dom.toggleClass(this.backdrop, 'active');
+        document.body.classList.toggle('menu-open', this.isOpen);
 
-        // Update toggle button
+        // Update toggle button icon and aria state
         this.toggleBtn.innerHTML = this.isOpen ? icons.close : icons.menu;
+        this.toggleBtn.setAttribute('aria-expanded', this.isOpen.toString());
     }
 
     /**
@@ -126,7 +146,11 @@ export class Navigation {
     closeMenu() {
         this.isOpen = false;
         dom.removeClass(this.menu, 'open');
+        dom.removeClass(this.toggleBtn, 'active');
+        dom.removeClass(this.backdrop, 'active');
+        document.body.classList.remove('menu-open');
         this.toggleBtn.innerHTML = icons.menu;
+        this.toggleBtn.setAttribute('aria-expanded', 'false');
     }
 
     /**

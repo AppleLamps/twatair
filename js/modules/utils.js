@@ -109,6 +109,29 @@ export const format = {
      * @returns {string} Formatted currency string
      */
     currency: (amount, currency = '€') => {
+        if (amount === 0 || amount === null || amount === undefined) {
+            return `${currency}0.00`;
+        }
+        
+        // Handle very small crypto prices
+        if (amount < 0.01 && amount > 0) {
+            // Find the first significant digit
+            const absAmount = Math.abs(amount);
+            const exponent = Math.floor(Math.log10(absAmount));
+            const decimals = Math.min(Math.max(-exponent + 2, 2), 12);
+            return `${currency}${amount.toFixed(decimals)}`;
+        }
+        
+        // Handle large numbers (millions+)
+        if (amount >= 1000000) {
+            return `${currency}${(amount / 1000000).toFixed(2)}M`;
+        }
+        
+        // Handle thousands
+        if (amount >= 1000) {
+            return `${currency}${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+        
         return `${currency}${amount.toFixed(2)}`;
     },
 
@@ -254,27 +277,41 @@ export const validate = {
 
     /**
      * Show validation error with rude message
+     * Errors persist until dismissed or field is corrected
      * @param {Element} input - Input element
      * @param {string} message - Error message
      */
     showError: (input, message) => {
+        // Remove existing error first
+        validate.clearError(input);
+
+        // Create error element with close button
         const errorEl = dom.create('div', {
-            className: 'alert',
-            textContent: message
+            className: 'form-error'
+        });
+        errorEl.innerHTML = `
+            <span class="form-error__message">${message}</span>
+            <button type="button" class="form-error__close" aria-label="Dismiss error">\u00D7</button>
+        `;
+
+        // Bind close button
+        const closeBtn = errorEl.querySelector('.form-error__close');
+        closeBtn.addEventListener('click', () => {
+            validate.clearError(input);
         });
 
-        // Remove existing error
-        const existing = input.parentNode.querySelector('.alert');
-        if (existing) existing.remove();
-
+        // Add error to DOM
         input.parentNode.insertBefore(errorEl, input.nextSibling);
         dom.addClass(input, 'error');
 
-        // Auto-remove after 3 seconds
-        setTimeout(() => {
-            if (errorEl.parentNode) errorEl.remove();
-            dom.removeClass(input, 'error');
-        }, 3000);
+        // Clear error when user starts typing
+        const clearOnInput = () => {
+            validate.clearError(input);
+            input.removeEventListener('input', clearOnInput);
+            input.removeEventListener('change', clearOnInput);
+        };
+        input.addEventListener('input', clearOnInput);
+        input.addEventListener('change', clearOnInput);
     },
 
     /**
@@ -282,8 +319,11 @@ export const validate = {
      * @param {Element} input - Input element
      */
     clearError: (input) => {
-        const error = input.parentNode.querySelector('.alert');
+        const error = input.parentNode.querySelector('.form-error');
         if (error) error.remove();
+        // Also check for old .alert class for backwards compatibility
+        const oldError = input.parentNode.querySelector('.alert');
+        if (oldError) oldError.remove();
         dom.removeClass(input, 'error');
     }
 };

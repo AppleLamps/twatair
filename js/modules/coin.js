@@ -6,12 +6,12 @@
 import { dom, format, random } from './utils.js';
 import { cryptoTicker } from './cryptoTicker.js';
 import { TOKEN_CONFIG, fetchTokenData, subscribeToTokenUpdates } from './tokenApi.js';
+import { toast } from './toast.js';
 
 export class Coin {
     constructor() {
         this.cryptoTicker = cryptoTicker;
         this.priceHistory = this.generatePriceHistory();
-        this.walletConnected = false;
         
         // $TWATAIR token information from centralized config
         this.tokenAddress = TOKEN_CONFIG.address;
@@ -28,16 +28,15 @@ export class Coin {
     async init() {
         await this.createCoinContent();
         this.bindEvents();
-        this.cryptoTicker.startUpdates();
         
-        // Subscribe to token API updates
+        // Subscribe to token API updates (primary data source)
         this.unsubscribe = subscribeToTokenUpdates((data) => {
             this.tokenData = data;
             this.updateFromApi(data);
         }, 30000);
         
-        this.updatePriceDisplay();
-        this.startPriceUpdates();
+        // Only use crypto ticker for the ticker bar, not for main price display
+        this.cryptoTicker.startUpdates();
     }
     
     /**
@@ -53,8 +52,13 @@ export class Coin {
         const priceValue = dom.get('#priceValue');
         const priceChange = dom.get('#priceChange');
         
-        if (priceValue && token.price) {
-            priceValue.textContent = format.currency(token.price, '$');
+        if (priceValue) {
+            if (token.price && token.price > 0) {
+                priceValue.textContent = format.currency(token.price, '$');
+            } else if (token.priceInSol && token.priceInSol > 0) {
+                // Show SOL price if USD not available
+                priceValue.textContent = `${token.priceInSol.toFixed(10)} SOL`;
+            }
         }
         
         if (priceChange && typeof token.priceChange24h === 'number') {
@@ -65,19 +69,25 @@ export class Coin {
         }
         
         // Update stats
-        if (token.marketCap) {
-            const marketCap = dom.get('#marketCap');
-            if (marketCap) marketCap.textContent = format.currency(token.marketCap, '$');
+        const marketCap = dom.get('#marketCap');
+        if (marketCap && token.marketCap) {
+            marketCap.textContent = format.currency(token.marketCap, '$');
         }
         
-        if (token.volume24h) {
-            const volume = dom.get('#volume');
-            if (volume) volume.textContent = format.currency(token.volume24h, '$');
+        const volume = dom.get('#volume');
+        if (volume && token.volume24h) {
+            volume.textContent = format.currency(token.volume24h, '$');
         }
         
-        if (token.circulatingSupply) {
-            const circulating = dom.get('#circulating');
-            if (circulating) circulating.textContent = token.circulatingSupply.toLocaleString();
+        const circulating = dom.get('#circulating');
+        if (circulating && token.circulatingSupply) {
+            circulating.textContent = token.circulatingSupply.toLocaleString();
+        }
+        
+        // Update total supply if available
+        const totalSupply = dom.get('#totalSupply');
+        if (totalSupply && token.totalSupply) {
+            totalSupply.textContent = token.totalSupply.toLocaleString();
         }
         
         // Show API status indicator
@@ -85,6 +95,11 @@ export class Coin {
         if (apiStatus) {
             apiStatus.textContent = data.mock ? 'DEMO MODE' : 'LIVE';
             apiStatus.className = `api-status ${data.mock ? 'demo' : 'live'}`;
+        }
+        
+        // Store current price for crypto ticker sync
+        if (token.price && token.price > 0) {
+            this.cryptoTicker.setTwatAirPrice(token.price, token.priceChange24h || 0);
         }
     }
 
@@ -118,9 +133,6 @@ export class Coin {
                 <a href="${this.bagsUrl}" target="_blank" rel="noopener" class="btn btn-success" id="buyCoinBtn">
                     BUY $TWATAIR ON BAGS.FM
                 </a>
-                <button class="btn" id="connectWalletBtn">
-                    CONNECT WALLET
-                </button>
             </div>
             
             <div class="token-address">
@@ -309,10 +321,6 @@ export class Coin {
      * Bind event listeners
      */
     bindEvents() {
-        // Connect wallet button
-        const connectBtn = dom.get('#connectWalletBtn');
-        dom.on(connectBtn, 'click', () => this.handleConnectWallet());
-        
         // Copy address button
         const copyBtn = dom.get('#copyAddressBtn');
         if (copyBtn) {
@@ -471,34 +479,19 @@ export class Coin {
             const originalText = copyBtn.textContent;
             copyBtn.textContent = 'COPIED!';
             copyBtn.classList.add('copied');
-            
+
+            toast.success('Token address copied to clipboard!');
+
             setTimeout(() => {
                 copyBtn.textContent = originalText;
                 copyBtn.classList.remove('copied');
             }, 2000);
         }).catch(() => {
-            alert(`Token Address: ${this.tokenAddress}`);
+            toast.info(`Token Address: ${this.tokenAddress}`, {
+                title: 'Copy Failed',
+                duration: 8000
+            });
         });
-    }
-
-    /**
-     * Handle connect wallet button click
-     */
-    handleConnectWallet() {
-        const messages = [
-            "Wallet connected! (Not really, this is just a demo)",
-            "MetaMask detected! Connecting to the blockchain of dreams...",
-            "Wallet connection successful! Your crypto journey begins now.",
-            "Connected to wallet! Ready to lose all your money to meme coins.",
-            "Wallet linked! Elon Musk is now watching your transactions."
-        ];
-
-        alert(random.pick(messages));
-
-        this.walletConnected = true;
-        const connectBtn = dom.get('#connectWalletBtn');
-        connectBtn.textContent = '✅ WALLET CONNECTED';
-        connectBtn.classList.add('connected');
     }
 
     /**
@@ -516,7 +509,9 @@ export class Coin {
         }
 
         // In a real app, this would fetch different data
-        alert(`${period} chart data loaded! (Actually just the same fake data)`);
+        toast.info(`${period} chart data loaded! (Actually just the same fake data)`, {
+            title: 'Chart Updated'
+        });
     }
 
     /**

@@ -4,6 +4,7 @@
  */
 
 import { dom, format, random, validate, animate } from './utils.js';
+import { toast } from './toast.js';
 
 export class BookingWidget {
     constructor() {
@@ -673,18 +674,17 @@ export class BookingWidget {
     confirmBooking() {
         const paymentMethod = dom.get('input[name="payment"]:checked').value;
 
-        let message = `Booking confirmed! Total: ${format.currency(this.bookingData.total)}\n\n`;
-
         if (paymentMethod === 'twatair') {
-            message += "Redirecting to crypto wallet... (just kidding, we don't accept crypto)\n\n";
-            message += "Your booking has been cancelled. Try again with real money.";
+            toast.warning(
+                "Redirecting to crypto wallet... just kidding, we don't accept crypto. Your booking has been cancelled. Try again with real money.",
+                { title: `Total: ${format.currency(this.bookingData.total)}`, duration: 6000 }
+            );
         } else {
-            message += "Thank you for choosing TwatAir!\n\n";
-            message += "Your flight will probably be delayed. We'll text you... maybe.\n\n";
-            message += "Remember: Ryanair charges less, but we're more honest about being shit.";
+            toast.success(
+                "Thank you for choosing TwatAir! Your flight will probably be delayed. We'll text you... maybe. Remember: Ryanair charges less, but we're more honest about being shit.",
+                { title: `Booking Confirmed: ${format.currency(this.bookingData.total)}`, duration: 8000 }
+            );
         }
-
-        alert(message);
 
         // Reset form
         this.resetBooking();
