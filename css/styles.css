@@ -18,10 +18,19 @@
     --border-radius: 4px;
     --radius-md: 10px;
     --transition: all 0.3s ease;
-    
+
     /* Layout reservations to prevent CLS */
     --header-height: 110px;
     --footer-min-height: 280px;
+
+    /* Touch target minimum (WCAG 2.5.5) */
+    --touch-target-min: 44px;
+
+    /* Safe area insets for notched devices */
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
 }
 
 /* ==========================================================================
@@ -157,7 +166,8 @@ a:hover {
 /* Buttons - Urgent CTA Style */
 .btn {
     display: inline-block;
-    padding: 12px 24px;
+    padding: 14px 24px;
+    min-height: var(--touch-target-min);
     background-color: var(--ryanair-yellow);
     color: var(--ryanair-blue);
     font-weight: 900;
@@ -169,6 +179,9 @@ a:hover {
     cursor: pointer;
     transition: var(--transition);
     letter-spacing: 1px;
+    /* Better touch behavior */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 button.btn {
@@ -360,12 +373,15 @@ label {
 
 input, select, textarea {
     width: 100%;
-    padding: 12px;
+    padding: 14px 12px;
+    min-height: var(--touch-target-min);
     border: 2px solid var(--ryanair-blue);
     border-radius: var(--border-radius);
-    font-size: 1rem;
+    font-size: 16px; /* Prevents iOS zoom on focus */
     background-color: var(--text-light);
     transition: var(--transition);
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 input:focus, select:focus, textarea:focus {
@@ -380,8 +396,23 @@ input.error, select.error, textarea.error {
 }
 
 input[type="checkbox"], input[type="radio"] {
-    width: auto;
-    margin-right: 8px;
+    width: 20px;
+    height: 20px;
+    min-height: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+    accent-color: var(--ryanair-blue);
+}
+
+/* Touch-friendly checkbox/radio labels */
+label:has(input[type="checkbox"]),
+label:has(input[type="radio"]) {
+    display: flex;
+    align-items: center;
+    min-height: var(--touch-target-min);
+    padding: 8px 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Header and Hero */
@@ -1231,12 +1262,23 @@ input[type="checkbox"], input[type="radio"] {
     gap: 12px;
 }
 
-/* Tables */
-/* Tables */
+/* Tables - Responsive wrapper for horizontal scroll on mobile */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+}
+
+.table-responsive .table {
+    margin-bottom: 0;
+}
+
 .table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    min-width: 500px;
 }
 
 .table th,
@@ -1244,6 +1286,7 @@ input[type="checkbox"], input[type="radio"] {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid var(--ryanair-blue);
+    white-space: nowrap;
 }
 
 .table th {
@@ -1251,6 +1294,8 @@ input[type="checkbox"], input[type="radio"] {
     color: var(--ryanair-blue);
     font-weight: 900;
     text-transform: uppercase;
+    position: sticky;
+    top: 0;
 }
 
 /* Animations */
@@ -1333,16 +1378,27 @@ input[type="checkbox"], input[type="radio"] {
     }
 }
 
-/* Responsive Design - Mobile First */
+/* ==========================================================================
+   RESPONSIVE DESIGN - MOBILE OPTIMIZATIONS
+   ========================================================================== */
+
+/* Tablet breakpoint (600-768px) */
 @media (max-width: 768px) {
     .container {
-        padding: 0 15px;
+        padding: 0 16px;
+        padding-left: max(16px, var(--safe-area-left));
+        padding-right: max(16px, var(--safe-area-right));
+    }
+
+    main {
+        padding: 24px 0 40px;
     }
 
     .grid-2,
     .grid-3,
     .grid-4 {
         grid-template-columns: 1fr;
+        gap: 16px;
     }
 
     .flex {
@@ -1350,35 +1406,311 @@ input[type="checkbox"], input[type="radio"] {
     }
 
     h1 {
-        font-size: 2.5rem;
+        font-size: clamp(1.75rem, 6vw, 2.5rem);
     }
 
     h2 {
-        font-size: 2rem;
+        font-size: clamp(1.4rem, 5vw, 2rem);
     }
 
     .btn {
         width: 100%;
         text-align: center;
+        padding: 16px 24px;
     }
 
     .card {
-        margin-bottom: 20px;
+        margin-bottom: 16px;
+    }
+
+    /* Form row - stack on mobile */
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    /* Better spacing for booking steps */
+    .booking-step {
+        padding: 16px;
+    }
+
+    /* Hero adjustments */
+    .hero {
+        padding: 24px 0;
+    }
+
+    .hero-container {
+        gap: 24px;
+    }
+
+    .hero-ctas {
+        flex-direction: column;
+    }
+
+    .hero-ctas .btn {
+        width: 100%;
+    }
+
+    /* Slogan adjustments */
+    .slogan {
+        font-size: 0.8rem;
+        padding: 0 8px;
+    }
+
+    /* Footer mobile */
+    .footer {
+        padding: 32px 0 16px;
+        padding-bottom: max(16px, var(--safe-area-bottom));
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 24px;
     }
 }
 
+/* Small tablet / large phone (481-600px) */
+@media (max-width: 600px) {
+    .container {
+        padding: 0 12px;
+        padding-left: max(12px, var(--safe-area-left));
+        padding-right: max(12px, var(--safe-area-right));
+    }
+
+    /* 2-column grids can stay as 2 columns on larger phones */
+    .grid-2 {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    /* Extras grid - ensure it stacks */
+    .extras-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Fee grid - stack */
+    .fee-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Coin features - stack */
+    .coin-features {
+        grid-template-columns: 1fr;
+    }
+
+    /* Stats grid - 2 columns on tablets */
+    .coin-stats .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Token address - stack vertically */
+    .token-address {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .address-value {
+        min-width: auto;
+        text-align: center;
+    }
+
+    .copy-btn {
+        align-self: center;
+    }
+}
+
+/* Small phones (max-width: 480px) */
 @media (max-width: 480px) {
     html {
-        font-size: 14px;
+        font-size: 15px;
+    }
+
+    .container {
+        padding: 0 12px;
+    }
+
+    main {
+        padding: 20px 0 32px;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+        letter-spacing: 0.5px;
+    }
+
+    h2 {
+        font-size: 1.35rem;
+    }
+
+    h3 {
+        font-size: 1.15rem;
     }
 
     .warning {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         padding: 12px;
     }
 
     .card {
-        padding: 15px;
+        padding: 14px;
+        border-width: 2px;
+    }
+
+    .card-header {
+        padding: 10px;
+        margin: -14px -14px 14px -14px;
+        font-size: 0.9rem;
+    }
+
+    /* Booking widget mobile optimizations */
+    .progress-indicator {
+        gap: 6px;
+    }
+
+    .progress-step {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+    }
+
+    .booking-step {
+        padding: 14px;
+    }
+
+    .booking-nav {
+        flex-direction: column;
+    }
+
+    .booking-nav .btn {
+        width: 100%;
+    }
+
+    /* Price display adjustments */
+    .price-value {
+        font-size: 1.6rem;
+    }
+
+    .total-amount {
+        font-size: 1.6rem;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+    }
+
+    /* Community stats - stack */
+    .community-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Coin stats - single column */
+    .coin-stats .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Chart adjustments */
+    .ascii-chart {
+        height: 140px;
+        padding: 10px;
+        gap: 4px;
+    }
+
+    .chart-controls {
+        flex-wrap: wrap;
+    }
+
+    .chart-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+
+    /* Destination cards */
+    .destination-insults {
+        gap: 6px;
+    }
+
+    .insult-tag {
+        font-size: 0.75rem;
+        padding: 3px 6px;
+    }
+
+    /* Flight info compact */
+    .flight-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+
+    /* Top bar */
+    .top-bar {
+        padding: 8px 10px;
+    }
+
+    .slogan {
+        font-size: 0.75rem;
+        line-height: 1.3;
+    }
+
+    /* Logo sizing */
+    .logo {
+        font-size: 1.2rem;
+        gap: 6px;
+    }
+
+    .logo-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Header main */
+    .header-main {
+        padding: 10px 0;
+        gap: 12px;
+    }
+}
+
+/* Extra small phones (max-width: 360px) */
+@media (max-width: 360px) {
+    html {
+        font-size: 14px;
+    }
+
+    .container {
+        padding: 0 10px;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    .btn {
+        padding: 14px 16px;
+        font-size: 0.9rem;
+    }
+
+    .card {
+        padding: 12px;
+    }
+
+    .card-header {
+        margin: -12px -12px 12px -12px;
+    }
+
+    /* Progress steps smaller */
+    .progress-step {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+        border-width: 2px;
+    }
+
+    /* Community stats - single column */
+    .community-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .logo {
+        font-size: 1.1rem;
     }
 }
 
@@ -1471,6 +1803,9 @@ input[type="checkbox"], input[type="radio"] {
         display: flex;
         align-items: center;
         justify-content: center;
+        min-width: var(--touch-target-min);
+        min-height: var(--touch-target-min);
+        padding: 10px;
     }
 
     .nav-menu {
@@ -1483,27 +1818,43 @@ input[type="checkbox"], input[type="radio"] {
         background-color: var(--text-light);
         border: 2px solid var(--ryanair-blue);
         border-top: none;
-        padding: 16px;
+        padding: 12px;
         gap: 4px;
         z-index: 100;
         box-shadow: 0 10px 30px var(--shadow-strong);
+        max-height: calc(100vh - var(--header-height) - 20px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .nav-menu.open {
         display: flex;
     }
-    
+
     .nav-menu li {
         width: 100%;
     }
-    
+
     .nav-menu li a {
         flex-direction: row;
         justify-content: flex-start;
-        gap: 12px;
-        padding: 12px 16px;
-        font-size: 0.85rem;
+        gap: 14px;
+        padding: 14px 16px;
+        min-height: var(--touch-target-min);
+        font-size: 0.95rem;
         width: 100%;
+        border-radius: var(--radius-md);
+    }
+
+    .nav-menu li a:active {
+        background-color: var(--ryanair-blue);
+        color: var(--text-light);
+        transform: scale(0.98);
+    }
+
+    .nav-icon svg {
+        width: 20px;
+        height: 20px;
     }
 }
 
@@ -1634,6 +1985,10 @@ input[type="checkbox"], input[type="radio"] {
 .icon-xl svg { width: 32px; height: 32px; }
 
 @media (max-width: 900px) {
+    :root {
+        --header-height: 100px;
+    }
+
     .hero-container {
         grid-template-columns: 1fr;
     }
@@ -1645,6 +2000,13 @@ input[type="checkbox"], input[type="radio"] {
     .coin-chart .chart-header {
         flex-direction: column;
         align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --header-height: 90px;
+        --footer-min-height: 200px;
     }
 }
 
@@ -1799,15 +2161,34 @@ input[type="checkbox"], input[type="radio"] {
 /* Mobile toast - slides from bottom */
 @media (max-width: 480px) {
     .toast-container {
-        bottom: 16px;
-        left: 16px;
-        right: 16px;
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        bottom: max(12px, var(--safe-area-bottom));
     }
 
     .toast {
         min-width: auto;
         max-width: none;
         transform: translateY(120%);
+        padding: 14px;
+    }
+
+    .toast__title {
+        font-size: 0.8rem;
+    }
+
+    .toast__message {
+        font-size: 0.85rem;
+    }
+
+    .toast__close {
+        min-width: var(--touch-target-min);
+        min-height: var(--touch-target-min);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: -8px -8px -8px 0;
     }
 
     @keyframes toastSlideIn {
@@ -2214,5 +2595,143 @@ textarea.error {
     select.error,
     textarea.error {
         animation: none;
+    }
+}
+
+/* ==========================================================================
+   TOUCH DEVICE OPTIMIZATIONS
+   ========================================================================== */
+
+/* Detect touch devices and add active states */
+@media (hover: none) and (pointer: coarse) {
+    /* Remove hover effects on touch devices */
+    .card:hover {
+        transform: none;
+        box-shadow: 0 4px 8px var(--shadow);
+    }
+
+    .destination-card:hover {
+        transform: none;
+    }
+
+    /* Active states for touch */
+    .btn:active {
+        transform: scale(0.96);
+        opacity: 0.9;
+    }
+
+    .card:active {
+        transform: scale(0.98);
+        box-shadow: 0 2px 4px var(--shadow);
+    }
+
+    .community-link:active {
+        background-color: var(--surface-muted);
+        transform: scale(0.98);
+    }
+
+    .extra-item:active {
+        background-color: var(--surface-accent);
+        transform: scale(0.98);
+    }
+
+    /* Larger tap targets for icons */
+    .copy-btn {
+        padding: 10px 16px;
+        min-height: var(--touch-target-min);
+    }
+
+    .chart-btn {
+        min-height: var(--touch-target-min);
+        padding: 10px 14px;
+    }
+
+    /* Better scrolling */
+    .table-responsive,
+    .nav-menu {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+}
+
+/* ==========================================================================
+   LANDSCAPE MOBILE OPTIMIZATIONS
+   ========================================================================== */
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .hero {
+        padding: 16px 0;
+    }
+
+    .hero-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    main {
+        padding: 16px 0 24px;
+    }
+
+    .nav-menu {
+        max-height: 60vh;
+    }
+
+    /* Reduce vertical spacing */
+    h1 {
+        margin-bottom: 0.5rem;
+    }
+
+    h2 {
+        margin-bottom: 0.4rem;
+    }
+}
+
+/* ==========================================================================
+   HIGH DPI / RETINA DISPLAY OPTIMIZATIONS
+   ========================================================================== */
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    /* Sharper borders on retina displays */
+    .card,
+    .btn,
+    input,
+    select,
+    textarea {
+        border-width: 2px;
+    }
+}
+
+/* ==========================================================================
+   PRINT STYLES (BASIC)
+   ========================================================================== */
+
+@media print {
+    .header,
+    .footer,
+    .nav-toggle,
+    .toast-container,
+    .crypto-ticker {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+        color: black;
+    }
+
+    .container {
+        max-width: 100%;
+        padding: 0;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: underline;
+    }
+
+    .btn {
+        border: 1px solid black;
+        background: white;
+        color: black;
     }
 }
