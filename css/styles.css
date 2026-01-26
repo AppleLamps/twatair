@@ -1811,8 +1811,8 @@ label:has(input[type="radio"]) {
     .nav-menu {
         display: none;
         flex-direction: column;
-        position: absolute;
-        top: 100%;
+        position: fixed;
+        top: var(--header-height);
         left: 0;
         right: 0;
         background-color: var(--text-light);
