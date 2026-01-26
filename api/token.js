@@ -184,7 +184,10 @@ function getMockData() {
  */
 export default async function handler(req, res) {
     // CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // TODO: In production, replace '*' with your actual domain(s):
+    // res.setHeader('Access-Control-Allow-Origin', 'https://yourdomain.com');
+    const allowedOrigin = process.env.ALLOWED_ORIGIN || '*';
+    res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     

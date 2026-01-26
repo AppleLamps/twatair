@@ -6,6 +6,25 @@
 import { dom, format, random, validate, animate } from './utils.js';
 import { toast } from './toast.js';
 
+// Constants
+const PRICE_UPDATE_INTERVAL_MS = 5000;
+
+/**
+ * Sanitize user input to prevent XSS
+ * @param {string} input - Raw user input
+ * @returns {string} Sanitized input
+ */
+function sanitizeInput(input) {
+    if (typeof input !== 'string') return '';
+    return input
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .trim();
+}
+
 export class BookingWidget {
     constructor() {
         this.currentStep = 1;
@@ -54,9 +73,15 @@ export class BookingWidget {
     async createWidget() {
         const container = dom.get('#booking-widget');
         if (!container) {
-            console.warn('Booking widget container not found');
             return;
         }
+
+        // Create form wrapper for proper accessibility
+        const form = dom.create('form', { 
+            className: 'booking-form',
+            'aria-label': 'Flight booking form'
+        });
+        form.setAttribute('novalidate', ''); // We handle validation manually
 
         const widget = dom.create('div', { className: 'booking-widget card' });
 
@@ -65,7 +90,7 @@ export class BookingWidget {
         widget.appendChild(progress);
 
         // Steps container
-        const stepsContainer = dom.create('div', { className: 'steps-container' });
+        const stepsContainer = dom.create('div', { className: 'steps-container', role: 'region', 'aria-live': 'polite' });
 
         // Step 1: Flight Selection
         const step1 = this.createStep1();
@@ -89,9 +114,15 @@ export class BookingWidget {
         const navButtons = this.createNavButtons();
         widget.appendChild(navButtons);
 
-        container.appendChild(widget);
+        // Wrap widget in form and append to container
+        form.appendChild(widget);
+        container.appendChild(form);
+
+        // Prevent form submission (we handle via JS)
+        form.addEventListener('submit', (e) => e.preventDefault());
 
         // Store references
+        this.form = form;
         this.widget = widget;
         this.stepsContainer = stepsContainer;
         this.navButtons = navButtons;
@@ -105,12 +136,21 @@ export class BookingWidget {
      * @returns {Element} Progress indicator element
      */
     createProgressIndicator() {
-        const progress = dom.create('div', { className: 'progress-indicator' });
+        const stepLabels = ['Flight Selection', 'Passenger Details', 'Extras & Fees', 'Payment'];
+        const progress = dom.create('div', { 
+            className: 'progress-indicator',
+            role: 'progressbar',
+            'aria-valuemin': '1',
+            'aria-valuemax': String(this.totalSteps),
+            'aria-valuenow': '1',
+            'aria-label': 'Booking progress'
+        });
 
         for (let i = 1; i <= this.totalSteps; i++) {
             const step = dom.create('div', {
                 className: `progress-step ${i === 1 ? 'active' : ''}`,
-                textContent: i
+                textContent: i,
+                'aria-label': `Step ${i}: ${stepLabels[i - 1]}`
             });
             progress.appendChild(step);
         }
@@ -356,27 +396,30 @@ export class BookingWidget {
      * @returns {Element} Navigation buttons container
      */
     createNavButtons() {
-        const nav = dom.create('div', { className: 'booking-nav' });
+        const nav = dom.create('div', { className: 'booking-nav', role: 'navigation', 'aria-label': 'Booking form navigation' });
 
         const prevBtn = dom.create('button', {
             className: 'btn',
             id: 'prev-btn',
             textContent: '← PREVIOUS',
-            type: 'button'
+            type: 'button',
+            'aria-label': 'Go to previous step'
         });
 
         const nextBtn = dom.create('button', {
             className: 'btn',
             id: 'next-btn',
             textContent: 'NEXT →',
-            type: 'button'
+            type: 'button',
+            'aria-label': 'Go to next step'
         });
 
         const bookBtn = dom.create('button', {
             className: 'btn btn-success',
             id: 'book-btn',
             textContent: 'CONFIRM BOOKING',
-            type: 'button'
+            type: 'submit',
+            'aria-label': 'Confirm and submit booking'
         });
 
         nav.appendChild(prevBtn);
@@ -468,6 +511,12 @@ export class BookingWidget {
      * @param {number} activeStep - Currently active step
      */
     updateProgress(activeStep) {
+        // Update aria-valuenow on progress bar
+        const progressBar = dom.get('.progress-indicator');
+        if (progressBar) {
+            progressBar.setAttribute('aria-valuenow', String(activeStep));
+        }
+
         dom.getAll('.progress-step').forEach((step, index) => {
             const stepNum = index + 1;
             dom.removeClass(step, 'active');
@@ -572,10 +621,10 @@ export class BookingWidget {
      * @returns {boolean} Is step 2 valid
      */
     validateStep2() {
-        const firstName = dom.get('#firstName').value;
-        const lastName = dom.get('#lastName').value;
-        const email = dom.get('#email').value;
-        const phone = dom.get('#phone').value;
+        const firstName = sanitizeInput(dom.get('#firstName').value);
+        const lastName = sanitizeInput(dom.get('#lastName').value);
+        const email = sanitizeInput(dom.get('#email').value);
+        const phone = sanitizeInput(dom.get('#phone').value);
 
         if (!validate.required(firstName)) {
             validate.showError(dom.get('#firstName'), "We need your name for our spam list!");
@@ -596,6 +645,12 @@ export class BookingWidget {
             validate.showError(dom.get('#phone'), "Phone number, so we can call you about delays!");
             return false;
         }
+
+        // Store sanitized values
+        this.bookingData.firstName = firstName;
+        this.bookingData.lastName = lastName;
+        this.bookingData.email = email;
+        this.bookingData.phone = phone;
 
         return true;
     }

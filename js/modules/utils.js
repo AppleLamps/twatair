@@ -328,6 +328,48 @@ export const validate = {
     }
 };
 
+// Debug logging utility - only logs in development
+export const logger = {
+    /**
+     * Check if debug mode is enabled
+     * @returns {boolean} True if debug mode is active
+     */
+    isDebug: () => {
+        return window.TwatAir?.config?.debug || 
+               window.location.hostname === 'localhost' || 
+               window.location.hostname === '127.0.0.1';
+    },
+
+    /**
+     * Log warning (always shown for important issues)
+     * @param {string} message - Warning message
+     * @param {...*} args - Additional arguments
+     */
+    warn: (message, ...args) => {
+        console.warn(message, ...args);
+    },
+
+    /**
+     * Log error (always shown)
+     * @param {string} message - Error message
+     * @param {...*} args - Additional arguments
+     */
+    error: (message, ...args) => {
+        console.error(message, ...args);
+    },
+
+    /**
+     * Debug log (only in development)
+     * @param {string} message - Debug message
+     * @param {...*} args - Additional arguments
+     */
+    debug: (message, ...args) => {
+        if (logger.isDebug()) {
+            console.log(`[DEBUG] ${message}`, ...args);
+        }
+    }
+};
+
 // Local storage utilities for persistence
 export const storage = {
     /**

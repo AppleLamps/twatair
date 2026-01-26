@@ -5,18 +5,24 @@
 
 import { dom, format, random } from './utils.js';
 
+// Constants
+const UPDATE_INTERVAL_MS = 3000;
+const PUMP_CHANCE_THRESHOLD = 0.1;
+const DUMP_CHANCE_THRESHOLD = 0.3;
+
 export class CryptoTicker {
     constructor() {
         this.tickerData = [
             { symbol: '$TWATAIR', price: 0.0000420, change: 0 },
             { symbol: '$RYANAIR', price: 0.0000001, change: 0 },
-            { symbol: '$OLEARY', price: 0.0000000, change: 0 },
+            { symbol: '$OLEARY', price: 0.0000001, change: 0 }, // Small non-zero to avoid division issues
             { symbol: '$ELON', price: 420.69, change: 0 },
             { symbol: '$DOGE', price: 0.420, change: 0 }
         ];
 
         this.updateInterval = null;
         this.isRunning = false;
+        this.boundVisibilityHandler = this.handleVisibilityChange.bind(this);
     }
 
     /**
@@ -96,10 +102,24 @@ export class CryptoTicker {
         // Initial update
         this.updatePrices();
 
-        // Update every 3 seconds
+        // Update at configured interval
         this.updateInterval = setInterval(() => {
             this.updatePrices();
-        }, 3000);
+        }, UPDATE_INTERVAL_MS);
+
+        // Add visibility change listener to pause when tab is hidden
+        document.addEventListener('visibilitychange', this.boundVisibilityHandler);
+    }
+
+    /**
+     * Handle page visibility change to save resources
+     */
+    handleVisibilityChange() {
+        if (document.hidden) {
+            this.stopUpdates();
+        } else {
+            this.startUpdates();
+        }
     }
 
     /**
@@ -131,12 +151,12 @@ export class CryptoTicker {
                     }
                     // Volatile meme coin - big pumps and dumps
                     const pumpChance = Math.random();
-                    if (pumpChance < 0.1) {
+                    if (pumpChance < PUMP_CHANCE_THRESHOLD) {
                         // 10% chance of massive pump
                         newPrice = oldPrice * (1 + random.between(50, 200) / 100);
                         changePercent = ((newPrice - oldPrice) / oldPrice) * 100;
                         this.triggerPumpAnimation();
-                    } else if (pumpChance < 0.3) {
+                    } else if (pumpChance < DUMP_CHANCE_THRESHOLD) {
                         // 20% chance of dump
                         newPrice = oldPrice * (1 - random.between(10, 50) / 100);
                         changePercent = ((newPrice - oldPrice) / oldPrice) * 100;
@@ -154,9 +174,9 @@ export class CryptoTicker {
                     break;
 
                 case '$OLEARY':
-                    // Worthless
-                    newPrice = 0.0000000;
-                    changePercent = 0;
+                    // Nearly worthless but non-zero to avoid division issues
+                    newPrice = 0.0000001;
+                    changePercent = -99.99;
                     break;
 
                 case '$ELON':
@@ -263,19 +283,11 @@ export class CryptoTicker {
     }
 
     /**
-     * Resume updates (after page visibility change)
-     */
-    resume() {
-        if (!this.isRunning) {
-            this.startUpdates();
-        }
-    }
-
-    /**
      * Destroy ticker and clean up
      */
     destroy() {
         this.stopUpdates();
+        document.removeEventListener('visibilitychange', this.boundVisibilityHandler);
         if (this.ticker && this.ticker.parentNode) {
             this.ticker.parentNode.removeChild(this.ticker);
         }

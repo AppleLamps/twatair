@@ -37,6 +37,20 @@ export class Coin {
         
         // Only use crypto ticker for the ticker bar, not for main price display
         this.cryptoTicker.startUpdates();
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => this.destroy());
+    }
+
+    /**
+     * Cleanup resources
+     */
+    destroy() {
+        if (this.unsubscribe) {
+            this.unsubscribe();
+            this.unsubscribe = null;
+        }
+        this.cryptoTicker.destroy();
     }
     
     /**
@@ -138,7 +152,7 @@ export class Coin {
             <div class="token-address">
                 <span class="address-label">CONTRACT:</span>
                 <code class="address-value" id="tokenAddress">${this.tokenAddress}</code>
-                <button class="copy-btn" id="copyAddressBtn" title="Copy address">COPY</button>
+                <button class="copy-btn" id="copyAddressBtn" title="Copy address" aria-label="Copy token contract address to clipboard">COPY</button>
             </div>
         `;
 
@@ -147,10 +161,10 @@ export class Coin {
         chart.innerHTML = `
             <div class="chart-header">
                 <h3>PRICE CHART (LAST 24H)</h3>
-                <div class="chart-controls">
-                    <button class="chart-btn active" data-period="24h">24H</button>
-                    <button class="chart-btn" data-period="7d">7D</button>
-                    <button class="chart-btn" data-period="30d">30D</button>
+                <div class="chart-controls" role="group" aria-label="Chart time period">
+                    <button class="chart-btn active" data-period="24h" aria-label="Show 24 hour chart" aria-pressed="true">24H</button>
+                    <button class="chart-btn" data-period="7d" aria-label="Show 7 day chart" aria-pressed="false">7D</button>
+                    <button class="chart-btn" data-period="30d" aria-label="Show 30 day chart" aria-pressed="false">30D</button>
                 </div>
             </div>
             <div class="chart-canvas" id="priceChart">
@@ -499,13 +513,17 @@ export class Coin {
      * @param {string} period - Chart period (24h, 7d, 30d)
      */
     changeChartPeriod(period) {
-        // Update active button
+        // Update active button and aria-pressed states
         const buttons = this.coinContent.querySelectorAll('.chart-btn');
-        buttons.forEach(btn => btn.classList.remove('active'));
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+            btn.setAttribute('aria-pressed', 'false');
+        });
 
         const activeBtn = this.coinContent.querySelector(`[data-period="${period}"]`);
         if (activeBtn) {
             activeBtn.classList.add('active');
+            activeBtn.setAttribute('aria-pressed', 'true');
         }
 
         // In a real app, this would fetch different data
