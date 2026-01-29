@@ -249,20 +249,24 @@ export class FeeCalculator {
         const totalBreakdown = dom.get('#total-breakdown');
         const ryanairComparison = dom.get('#ryanair-comparison');
 
-        // Animate price change
-        const oldTotal = parseFloat(totalAmount.textContent.replace('€', '')) || 0;
-        if (total !== oldTotal) {
-            totalAmount.style.transform = 'scale(1.1)';
-            totalAmount.style.color = total > oldTotal ? '#FF0000' : '#00AA00';
+        // Update price immediately - use CSS class for animation
+        const oldTotal = parseFloat(totalAmount.textContent.replace('€', '').replace(',', '')) || 0;
 
-            setTimeout(() => {
-                totalAmount.style.transform = 'scale(1)';
-                totalAmount.style.color = '';
-            }, 300);
-        }
-
+        // Update the text content immediately
         totalAmount.textContent = format.currency(total);
         totalBreakdown.innerHTML = breakdown.map(item => `<div>${item}</div>`).join('');
+
+        // Animate price change with CSS class (non-blocking)
+        if (total !== oldTotal) {
+            // Remove any existing animation class
+            totalAmount.classList.remove('price-increase', 'price-decrease');
+
+            // Force reflow to restart animation
+            void totalAmount.offsetWidth;
+
+            // Add appropriate animation class
+            totalAmount.classList.add(total > oldTotal ? 'price-increase' : 'price-decrease');
+        }
 
         // Ryanair comparison (always cheaper, but not by much)
         const ryanairPrice = Math.max(5, total - random.between(50, 150));
