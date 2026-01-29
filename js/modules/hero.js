@@ -98,11 +98,22 @@ export class Hero {
         const warningBanner = dom.create('div', { className: 'warning hero-warning' });
         warningBanner.innerHTML = `${icons.warning} <strong>WARNING:</strong> Our flights are so cheap, your dignity will pay the difference!`;
 
+        // Memecoin disclaimer
+        const memeDisclaimer = dom.create('div', { className: 'memecoin-disclaimer' });
+        memeDisclaimer.innerHTML = `
+            <strong>💸 ABOUT $TWATAIR TOKEN:</strong> Let's be clear – $TWATAIR is a meme coin, not an investment.
+            It's for laughs, community vibes, and maybe one day buying Ryanair (probably not).
+            Don't bet your rent money, your nan's pension, or anything you can't afford to lose.
+            If it moons, great. If it tanks, at least you'll have a funny story.
+            This isn't financial advice – we can barely run an airline.
+        `;
+
         // Assemble hero content
         heroContent.appendChild(headline);
         heroContent.appendChild(subheadline);
         heroContent.appendChild(ctaContainer);
         heroContent.appendChild(warningBanner);
+        heroContent.appendChild(memeDisclaimer);
 
         // Hero visual/booking widget area
         const heroVisual = dom.create('div', { className: 'hero-visual' });

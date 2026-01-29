@@ -581,6 +581,25 @@ label:has(input[type="radio"]) {
     flex-shrink: 0;
 }
 
+.memecoin-disclaimer {
+    background-color: #FFF8E6;
+    border: 2px dashed var(--ryanair-yellow);
+    border-radius: var(--border-radius);
+    padding: 14px 16px;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--ryanair-dark-blue);
+    text-align: center;
+}
+
+.memecoin-disclaimer strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+    color: var(--ryanair-blue);
+}
+
 .hero-visual {
     display: flex;
     justify-content: center;
