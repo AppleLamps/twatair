@@ -9,7 +9,7 @@ Visit: [Your Vercel URL here]
 ## Features
 
 - Multi-page static site with dynamic JavaScript modules
-- $TWATAIR meme coin integration via Bags.fm
+- $TWATAIR meme coin integration via Pump.Fun
 - Real-time crypto price ticker
 - Flight booking parody with absurd fees
 - Responsive design with custom SVG icons
