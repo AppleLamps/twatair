@@ -22,6 +22,7 @@ export class CryptoTicker {
 
         this.updateInterval = null;
         this.isRunning = false;
+        this.visibilityHandlerAttached = false;
         this.boundVisibilityHandler = this.handleVisibilityChange.bind(this);
     }
 
@@ -107,8 +108,12 @@ export class CryptoTicker {
             this.updatePrices();
         }, UPDATE_INTERVAL_MS);
 
-        // Add visibility change listener to pause when tab is hidden
-        document.addEventListener('visibilitychange', this.boundVisibilityHandler);
+        // Pause when tab is hidden - attach once (startUpdates re-runs on every
+        // visibility restore, so an unguarded addEventListener would stack listeners)
+        if (!this.visibilityHandlerAttached) {
+            document.addEventListener('visibilitychange', this.boundVisibilityHandler);
+            this.visibilityHandlerAttached = true;
+        }
     }
 
     /**
@@ -288,6 +293,7 @@ export class CryptoTicker {
     destroy() {
         this.stopUpdates();
         document.removeEventListener('visibilitychange', this.boundVisibilityHandler);
+        this.visibilityHandlerAttached = false;
         if (this.ticker && this.ticker.parentNode) {
             this.ticker.parentNode.removeChild(this.ticker);
         }

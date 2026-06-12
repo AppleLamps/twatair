@@ -37,6 +37,20 @@ export class Header {
         const headerContainer = dom.get('#header-container');
         if (!headerContainer) return;
 
+        // Skip link for keyboard users - first focusable element on the page
+        const skipLink = dom.create('a', {
+            href: '#main-content',
+            className: 'skip-link',
+            textContent: 'Skip to main content'
+        });
+        headerContainer.appendChild(skipLink);
+
+        // Make the skip target programmatically focusable
+        const mainContent = dom.get('#main-content');
+        if (mainContent) {
+            mainContent.setAttribute('tabindex', '-1');
+        }
+
         const header = dom.create('header', { className: 'header' });
 
         // Top bar with slogan
@@ -89,6 +103,9 @@ export class Header {
      * Add dynamic slogan rotation
      */
     addDynamicSlogan() {
+        // Respect reduced-motion preference - keep the initial slogan static
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
         // Change slogan every 10 seconds
         setInterval(() => {
             // Fade out

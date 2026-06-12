@@ -429,6 +429,33 @@ label:has(input[type="radio"]) {
     -webkit-tap-highlight-color: transparent;
 }
 
+/* Skip link - visually hidden until focused */
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 16px;
+    z-index: 2000;
+    padding: 12px 20px;
+    background-color: var(--ryanair-blue);
+    color: var(--ryanair-yellow);
+    font-weight: 900;
+    text-transform: uppercase;
+    border-radius: var(--border-radius);
+    border: 3px solid var(--ryanair-yellow);
+    transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+    top: 16px;
+    color: var(--ryanair-yellow);
+    text-decoration: none;
+}
+
+/* Skip target: suppress the focus ring on the main landmark itself */
+#main-content:focus {
+    outline: none;
+}
+
 /* Header and Hero */
 .header {
     background-color: var(--surface);
@@ -699,6 +726,11 @@ label:has(input[type="radio"]) {
     border: 2px solid var(--border-subtle);
     border-radius: var(--radius-md);
     padding: 20px;
+}
+
+/* Steps receive programmatic focus on navigation - no visible ring needed */
+.booking-step:focus {
+    outline: none;
 }
 
 .form-row {
@@ -2309,6 +2341,8 @@ label:has(input[type="radio"]) {
 }
 
 .toast {
+    position: relative;
+    /* Anchors .toast__progress even when reduced-motion removes the transform */
     display: flex;
     align-items: flex-start;
     gap: 12px;

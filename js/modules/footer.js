@@ -6,6 +6,7 @@
 import { dom, random } from './utils.js';
 import { icons } from './icons.js';
 import { TOKEN_CONFIG } from './tokenApi.js';
+import { toast } from './toast.js';
 
 export class Footer {
     constructor() { }
@@ -146,14 +147,14 @@ export class Footer {
             "We're sorry you're unhappy. Here's a voucher for €5 off your next flight. Just kidding!"
         ];
 
-        alert(random.pick(responses));
+        toast.info(random.pick(responses), { title: 'Complaint Received', duration: 6000 });
     }
 
     /**
      * Show phone response
      */
     showPhoneResponse() {
-        alert("All our operators are currently busy insulting passengers. Please hold... or better yet, hang up and book with someone who gives a shit.");
+        toast.info("All our operators are currently busy insulting passengers. Please hold... or better yet, hang up and book with someone who gives a shit.", { title: 'On Hold', duration: 6000 });
     }
 }
 

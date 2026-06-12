@@ -50,8 +50,9 @@ export class ToastManager {
         if (this.container) return;
 
         // Create toast container
+        // role="status" announces politely without the implicit assertiveness of role="alert"
         this.container = dom.create('div', { className: 'toast-container' });
-        this.container.setAttribute('role', 'alert');
+        this.container.setAttribute('role', 'status');
         this.container.setAttribute('aria-live', 'polite');
         document.body.appendChild(this.container);
     }
@@ -80,14 +81,19 @@ export class ToastManager {
         toast.setAttribute('data-toast-id', id);
 
         toast.innerHTML = `
-            <span class="toast__icon">${config.icon}</span>
+            <span class="toast__icon" aria-hidden="true">${config.icon}</span>
             <div class="toast__content">
-                <div class="toast__title">${options.title || config.title}</div>
-                <div class="toast__message">${message}</div>
+                <div class="toast__title"></div>
+                <div class="toast__message"></div>
             </div>
             <button class="toast__close" aria-label="Close notification">\u00D7</button>
             ${duration > 0 ? '<div class="toast__progress"></div>' : ''}
         `;
+
+        // Set title/message via textContent so caller-supplied strings
+        // (including API data) can never inject HTML
+        toast.querySelector('.toast__title').textContent = options.title || config.title;
+        toast.querySelector('.toast__message').textContent = message;
 
         // Bind close button
         const closeBtn = toast.querySelector('.toast__close');

@@ -199,6 +199,9 @@ export class Hero {
      * Start headline rotation
      */
     startHeadlineRotation() {
+        // Respect reduced-motion preference - keep the initial headline static
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
         setInterval(() => {
             this.rotateHeadline();
         }, 8000); // Change every 8 seconds

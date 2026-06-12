@@ -48,23 +48,23 @@ export class Contact {
                 <div class="form-row">
                     <div class="form-group">
                         <label for="contactFirstName">FIRST NAME *</label>
-                        <input type="text" id="contactFirstName" name="firstName" required>
+                        <input type="text" id="contactFirstName" name="firstName" required autocomplete="given-name">
                     </div>
 
                     <div class="form-group">
                         <label for="contactLastName">LAST NAME *</label>
-                        <input type="text" id="contactLastName" name="lastName" required>
+                        <input type="text" id="contactLastName" name="lastName" required autocomplete="family-name">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="contactEmail">EMAIL *</label>
-                    <input type="email" id="contactEmail" name="email" required>
+                    <input type="email" id="contactEmail" name="email" required autocomplete="email">
                 </div>
 
                 <div class="form-group">
                     <label for="contactPhone">PHONE</label>
-                    <input type="tel" id="contactPhone" name="phone">
+                    <input type="tel" id="contactPhone" name="phone" autocomplete="tel">
                 </div>
             </div>
 
@@ -125,7 +125,9 @@ export class Contact {
         // Response area
         const responseArea = dom.create('div', {
             className: 'contact-response',
-            id: 'contactResponse'
+            id: 'contactResponse',
+            role: 'status',
+            'aria-live': 'polite'
         });
 
         // Contact info
@@ -241,6 +243,12 @@ export class Contact {
      * @returns {boolean} Is field valid
      */
     validateField(field) {
+        // Checkboxes/radios (referral group) have no text value to validate,
+        // and their parent is a <label>, which clearError must not touch
+        if (field.type === 'checkbox' || field.type === 'radio') {
+            return true;
+        }
+
         const value = field.value.trim();
 
         // Clear previous errors
@@ -432,7 +440,7 @@ export class Contact {
                 responseClass += ' success';
                 responseContent = `
                     <h4>MESSAGE SENT!</h4>
-                    <p>${message}</p>
+                    <p class="response-message"></p>
                     <p><em>Don't hold your breath waiting for a proper response.</em></p>
                 `;
                 break;
@@ -441,7 +449,7 @@ export class Contact {
                 responseClass += ' warning';
                 responseContent = `
                     <h4>ERROR!</h4>
-                    <p>${message}</p>
+                    <p class="response-message"></p>
                     <p><em>Try again, or give up. Your choice.</em></p>
                 `;
                 break;
@@ -449,6 +457,12 @@ export class Contact {
 
         const responseDiv = dom.create('div', { className: responseClass });
         responseDiv.innerHTML = responseContent;
+
+        // Inject the message via textContent so it can never carry HTML
+        const messageEl = responseDiv.querySelector('.response-message');
+        if (messageEl) {
+            messageEl.textContent = message;
+        }
 
         this.responseArea.appendChild(responseDiv);
     }
@@ -478,7 +492,10 @@ export class Contact {
     resetForm() {
         this.form.reset();
         this.responseArea.innerHTML = '';
-        validate.clearError(this.form);
+
+        // Clear every field-level error, not just the first one
+        this.form.querySelectorAll('.form-error').forEach(error => error.remove());
+        this.form.querySelectorAll('.error').forEach(field => field.classList.remove('error'));
     }
 
     /**

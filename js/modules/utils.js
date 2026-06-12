@@ -23,6 +23,10 @@ export const dom = {
                 element.textContent = value;
             } else if (key === 'innerHTML') {
                 element.innerHTML = value;
+            } else if (key === 'checked' || key === 'disabled' || key === 'selected' || key === 'required') {
+                // Boolean properties: setAttribute('checked', false) still renders
+                // as checked because attribute presence is what counts
+                element[key] = Boolean(value);
             } else {
                 element.setAttribute(key, value);
             }

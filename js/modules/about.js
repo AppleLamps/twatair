@@ -4,6 +4,7 @@
  */
 
 import { dom, random } from './utils.js';
+import { toast } from './toast.js';
 
 export class About {
     constructor() {
@@ -219,7 +220,7 @@ export class About {
             `Back in ${year}, ${title} started the revolution.`
         ];
 
-        alert(random.pick(reactions));
+        toast.info(random.pick(reactions), { title: 'TwatAir History' });
     }
 
     /**
@@ -235,7 +236,7 @@ export class About {
             "Elon vs O'Leary: The feud that launched a thousand memes."
         ];
 
-        alert(random.pick(reactions));
+        toast.info(random.pick(reactions), { title: 'Legendary Quote' });
     }
 
     /**

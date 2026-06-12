@@ -20,6 +20,8 @@ export class Coin {
         // API data
         this.tokenData = null;
         this.unsubscribe = null;
+        this.priceUpdateInterval = null;
+        this.boundUnloadHandler = null;
     }
 
     /**
@@ -38,8 +40,9 @@ export class Coin {
         // Only use crypto ticker for the ticker bar, not for main price display
         this.cryptoTicker.startUpdates();
 
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => this.destroy());
+        // Cleanup on page unload (store the handler so it can be removed in destroy)
+        this.boundUnloadHandler = () => this.destroy();
+        window.addEventListener('beforeunload', this.boundUnloadHandler);
     }
 
     /**
@@ -49,6 +52,14 @@ export class Coin {
         if (this.unsubscribe) {
             this.unsubscribe();
             this.unsubscribe = null;
+        }
+        if (this.priceUpdateInterval) {
+            clearInterval(this.priceUpdateInterval);
+            this.priceUpdateInterval = null;
+        }
+        if (this.boundUnloadHandler) {
+            window.removeEventListener('beforeunload', this.boundUnloadHandler);
+            this.boundUnloadHandler = null;
         }
         this.cryptoTicker.destroy();
     }
@@ -424,8 +435,10 @@ export class Coin {
      * Start price updates
      */
     startPriceUpdates() {
-        // Update price every 5 seconds
-        setInterval(() => {
+        if (this.priceUpdateInterval) return;
+
+        // Update price every 5 seconds (cleared in destroy)
+        this.priceUpdateInterval = setInterval(() => {
             this.updatePriceDisplay();
         }, 5000);
     }

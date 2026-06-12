@@ -137,12 +137,11 @@ export class BookingWidget {
      */
     createProgressIndicator() {
         const stepLabels = ['Flight Selection', 'Passenger Details', 'Extras & Fees', 'Payment'];
-        const progress = dom.create('div', { 
+        // role="list" instead of "progressbar": a progressbar is a single scalar
+        // and cannot contain labelled children
+        const progress = dom.create('div', {
             className: 'progress-indicator',
-            role: 'progressbar',
-            'aria-valuemin': '1',
-            'aria-valuemax': String(this.totalSteps),
-            'aria-valuenow': '1',
+            role: 'list',
             'aria-label': 'Booking progress'
         });
 
@@ -150,8 +149,12 @@ export class BookingWidget {
             const step = dom.create('div', {
                 className: `progress-step ${i === 1 ? 'active' : ''}`,
                 textContent: i,
+                role: 'listitem',
                 'aria-label': `Step ${i}: ${stepLabels[i - 1]}`
             });
+            if (i === 1) {
+                step.setAttribute('aria-current', 'step');
+            }
             progress.appendChild(step);
         }
 
@@ -164,10 +167,9 @@ export class BookingWidget {
      */
     createStep1() {
         const step = dom.create('div', { className: 'booking-step', 'data-step': '1' });
-        const now = new Date();
-        const minDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-            .toISOString()
-            .split('T')[0];
+        // en-CA locale gives YYYY-MM-DD in the user's local timezone,
+        // avoiding off-by-one-day errors from UTC offset arithmetic
+        const minDate = new Date().toLocaleDateString('en-CA');
 
         step.innerHTML = `
             <h3>SELECT YOUR FLIGHT</h3>
@@ -234,23 +236,23 @@ export class BookingWidget {
             <div class="form-row">
                 <div class="form-group">
                     <label for="firstName">FIRST NAME</label>
-                    <input type="text" id="firstName" required placeholder="Enter your first name">
+                    <input type="text" id="firstName" required placeholder="Enter your first name" autocomplete="given-name">
                 </div>
 
                 <div class="form-group">
                     <label for="lastName">LAST NAME</label>
-                    <input type="text" id="lastName" required placeholder="Enter your last name">
+                    <input type="text" id="lastName" required placeholder="Enter your last name" autocomplete="family-name">
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="email">EMAIL</label>
-                <input type="email" id="email" required placeholder="we@spam.you">
+                <input type="email" id="email" required placeholder="we@spam.you" autocomplete="email">
             </div>
 
             <div class="form-group">
                 <label for="phone">PHONE</label>
-                <input type="tel" id="phone" required placeholder="+353 WE CHARGE FOR THIS">
+                <input type="tel" id="phone" required placeholder="+353 WE CHARGE FOR THIS" autocomplete="tel">
             </div>
 
             <div class="alert">
@@ -485,6 +487,8 @@ export class BookingWidget {
      * @param {number} stepNumber - Step to show
      */
     showStep(stepNumber) {
+        const isStepChange = stepNumber !== this.currentStep;
+
         // Hide all steps
         dom.getAll('.booking-step').forEach(step => {
             step.style.display = 'none';
@@ -495,6 +499,13 @@ export class BookingWidget {
         if (targetStep) {
             targetStep.style.display = 'block';
             animate.fadeIn(targetStep);
+
+            // Move focus to the new step so keyboard/screen-reader users
+            // land on the step content instead of staying on the nav button
+            if (isStepChange) {
+                targetStep.setAttribute('tabindex', '-1');
+                targetStep.focus({ preventScroll: true });
+            }
         }
 
         // Update progress
@@ -511,19 +522,15 @@ export class BookingWidget {
      * @param {number} activeStep - Currently active step
      */
     updateProgress(activeStep) {
-        // Update aria-valuenow on progress bar
-        const progressBar = dom.get('.progress-indicator');
-        if (progressBar) {
-            progressBar.setAttribute('aria-valuenow', String(activeStep));
-        }
-
         dom.getAll('.progress-step').forEach((step, index) => {
             const stepNum = index + 1;
             dom.removeClass(step, 'active');
             dom.removeClass(step, 'completed');
+            step.removeAttribute('aria-current');
 
             if (stepNum === activeStep) {
                 dom.addClass(step, 'active');
+                step.setAttribute('aria-current', 'step');
             } else if (stepNum < activeStep) {
                 dom.addClass(step, 'completed');
             }
@@ -727,7 +734,12 @@ export class BookingWidget {
      * Confirm booking
      */
     confirmBooking() {
-        const paymentMethod = dom.get('input[name="payment"]:checked').value;
+        const paymentInput = dom.get('input[name="payment"]:checked');
+        if (!paymentInput) {
+            toast.error('Pick a payment method. Even we can\'t charge you nothing.');
+            return;
+        }
+        const paymentMethod = paymentInput.value;
 
         if (paymentMethod === 'twatair') {
             toast.warning(
@@ -755,10 +767,9 @@ export class BookingWidget {
             extras: [], basePrice: 0, fees: {}, total: 0
         };
 
-        // Reset form
-        const form = this.widget.querySelector('form');
-        if (form && typeof form.reset === 'function') {
-            form.reset();
+        // Reset form (the <form> wraps the widget, so use the stored reference)
+        if (this.form && typeof this.form.reset === 'function') {
+            this.form.reset();
         } else {
             this.widget.querySelectorAll('input, select, textarea').forEach((input) => {
                 if (input.type === 'checkbox' || input.type === 'radio') {

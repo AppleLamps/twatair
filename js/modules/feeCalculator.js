@@ -4,6 +4,7 @@
  */
 
 import { dom, format, random } from './utils.js';
+import { toast } from './toast.js';
 
 export class FeeCalculator {
     constructor() {
@@ -45,6 +46,7 @@ export class FeeCalculator {
         };
 
         this.defaultFees = JSON.parse(JSON.stringify(this.fees));
+        this.currentTotal = 0;
     }
 
     /**
@@ -216,15 +218,11 @@ export class FeeCalculator {
 
             // Special handling for certain fees
             if (feeKey === 'elonEndorsement' && checked) {
-                setTimeout(() => {
-                    alert("🚀 Elon Musk has endorsed your booking! (Not really, but thanks for the extra €420)");
-                }, 500);
+                toast.success("Elon Musk has endorsed your booking! (Not really, but thanks for the extra €420)", { title: '🚀 Endorsed' });
             }
 
             if (feeKey === 'specialNeedsChimp' && checked) {
-                setTimeout(() => {
-                    alert("🐒 Special assistance chimp has been assigned to your flight. Hope you're not afraid of monkeys.");
-                }, 500);
+                toast.info("Special assistance chimp has been assigned to your flight. Hope you're not afraid of monkeys.", { title: '🐒 Chimp Assigned' });
             }
         }
     }
@@ -249,8 +247,10 @@ export class FeeCalculator {
         const totalBreakdown = dom.get('#total-breakdown');
         const ryanairComparison = dom.get('#ryanair-comparison');
 
-        // Update price immediately - use CSS class for animation
-        const oldTotal = parseFloat(totalAmount.textContent.replace('€', '').replace(',', '')) || 0;
+        // Track the previous total numerically - parsing the formatted DOM string
+        // breaks once locale thousands separators appear
+        const oldTotal = this.currentTotal;
+        this.currentTotal = total;
 
         // Update the text content immediately
         totalAmount.textContent = format.currency(total);
@@ -338,6 +338,12 @@ export class FeeCalculator {
      * Handle "Fire the Twat" donation
      */
     fireTheTwat() {
+        // One donation per session - repeated clicks shouldn't re-toast or re-render
+        if (this.fees.donation) {
+            toast.info("You've already donated. Michael O'Leary can only be fired once.", { title: 'Already Donated' });
+            return;
+        }
+
         const messages = [
             "Thank you for your donation! €50 has been added to the 'Fire Michael O\'Leary' fund.",
             "Donation received! We're one step closer to buying Ryanair and firing that twat.",
@@ -346,20 +352,18 @@ export class FeeCalculator {
             "Elon Musk has been notified of your donation. He approves."
         ];
 
-        alert(random.pick(messages));
+        toast.success(random.pick(messages), { title: 'Donation Received', duration: 6000 });
 
         // Add a small donation fee to the total
-        setTimeout(() => {
-            this.fees.donation = {
-                name: 'Fire the Twat Donation',
-                amount: 50.00,
-                checked: true
-            };
+        this.fees.donation = {
+            name: 'Fire the Twat Donation',
+            amount: 50.00,
+            checked: true
+        };
 
-            // Re-render the fee grid to include donation
-            this.updateFeeGrid();
-            this.updateTotal();
-        }, 1000);
+        // Re-render the fee grid to include donation
+        this.updateFeeGrid();
+        this.updateTotal();
     }
 
     /**

@@ -4,6 +4,7 @@
  */
 
 import { dom, format, random } from './utils.js';
+import { toast } from './toast.js';
 
 export class Destinations {
     constructor() {
@@ -283,7 +284,7 @@ export class Destinations {
             `${destination.name} is closer than you think. Our flight takes longer though.`
         ];
 
-        alert(random.pick(facts));
+        toast.info(random.pick(facts), { title: `About ${destination.name}` });
     }
 
     /**
