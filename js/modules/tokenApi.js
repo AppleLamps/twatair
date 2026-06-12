@@ -5,8 +5,8 @@
 
 // Token configuration
 export const TOKEN_CONFIG = {
-    address: '5rRs4RckuE19GQ3CtN3Ju4CTRtAahTHuuEuQYqhfBAGS',
-    bagsUrl: 'https://bags.fm/5rRs4RckuE19GQ3CtN3Ju4CTRtAahTHuuEuQYqhfBAGS',
+    address: 'J7gpq8G5L9VzHF7FZzL679Miw1KQ1HHmCgxavCEqpump',
+    tradingUrl: 'https://pump.fun/coin/J7gpq8G5L9VzHF7FZzL679Miw1KQ1HHmCgxavCEqpump',
     symbol: '$TWATAIR',
     name: 'TwatAir Coin'
 };
@@ -20,7 +20,7 @@ const FALLBACK_DATA = {
         address: TOKEN_CONFIG.address,
         symbol: TOKEN_CONFIG.symbol,
         name: TOKEN_CONFIG.name,
-        tradingUrl: TOKEN_CONFIG.bagsUrl,
+        tradingUrl: TOKEN_CONFIG.tradingUrl,
         price: 0.0000420,
         priceChange24h: 5.2,
         marketCap: 420690,
@@ -50,7 +50,7 @@ export async function fetchTokenData() {
     if (tokenCache.data && (now - tokenCache.timestamp) < CACHE_TTL) {
         return tokenCache.data;
     }
-    
+
     try {
         const response = await fetch(`${API_BASE}/token`, {
             method: 'GET',
@@ -58,20 +58,20 @@ export async function fetchTokenData() {
                 'Content-Type': 'application/json'
             }
         });
-        
+
         if (!response.ok) {
             console.warn('API request failed, using fallback data');
             return getFallbackData();
         }
-        
+
         const data = await response.json();
-        
+
         // Update cache
         tokenCache = {
             data,
             timestamp: now
         };
-        
+
         return data;
     } catch (error) {
         console.warn('Failed to fetch token data:', error);
@@ -87,7 +87,7 @@ function getFallbackData() {
     const randomChange = (Math.random() - 0.5) * 20; // -10% to +10%
     const basePrice = 0.0000420;
     const randomPrice = basePrice * (1 + randomChange / 100);
-    
+
     return {
         ...FALLBACK_DATA,
         token: {
@@ -113,11 +113,11 @@ export async function checkApiHealth() {
                 'Content-Type': 'application/json'
             }
         });
-        
+
         if (!response.ok) {
             return false;
         }
-        
+
         const data = await response.json();
         return data.status === 'ok';
     } catch (error) {
@@ -135,23 +135,23 @@ export async function checkApiHealth() {
 export function subscribeToTokenUpdates(callback, interval = 30000) {
     // Initial fetch
     fetchTokenData().then(callback);
-    
+
     // Set up interval
     const intervalId = setInterval(async () => {
         const data = await fetchTokenData();
         callback(data);
     }, interval);
-    
+
     // Return unsubscribe function
     return () => clearInterval(intervalId);
 }
 
 /**
  * Get token trading URL
- * @returns {string} Bags.fm trading URL
+ * @returns {string} Pump.fun trading URL
  */
 export function getTradingUrl() {
-    return TOKEN_CONFIG.bagsUrl;
+    return TOKEN_CONFIG.tradingUrl;
 }
 
 /**

@@ -13,15 +13,12 @@
         "twatair",
         "meme-coin",
         "solana",
-        "bags-fm"
+        "pump-fun"
     ],
     "author": "",
     "license": "MIT",
     "engines": {
         "node": ">=18.0.0"
     },
-    "dependencies": {
-        "@bagsfm/bags-sdk": "^1.2.7",
-        "@solana/web3.js": "^1.98.4"
-    }
+    "dependencies": {}
 }

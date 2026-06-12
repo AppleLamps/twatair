@@ -8,7 +8,7 @@ import { icons } from './icons.js';
 import { TOKEN_CONFIG } from './tokenApi.js';
 
 export class Footer {
-    constructor() {}
+    constructor() { }
 
     /**
      * Initialize footer
@@ -75,24 +75,24 @@ export class Footer {
             { text: 'Complaints@TwatAir.com', icon: 'email', action: () => this.showComplaintResponse() },
             { text: '1-800-FUCK-RYAN', icon: 'phone', action: () => this.showPhoneResponse() },
             { text: '@TwatAir_Official', icon: 'twitter', href: '#' },
-            { text: 'Buy $TWATAIR Coin', icon: 'coinStack', href: TOKEN_CONFIG.bagsUrl, external: true }
+            { text: 'Buy $TWATAIR Coin', icon: 'coinStack', href: TOKEN_CONFIG.tradingUrl, external: true }
         ];
 
         contactLinks.forEach(item => {
             const li = dom.create('li');
             const link = dom.create('a', { href: item.href || '#' });
-            
+
             // Add external link attributes
             if (item.external) {
                 link.setAttribute('target', '_blank');
                 link.setAttribute('rel', 'noopener');
             }
-            
+
             // Add icon
             const iconSpan = dom.create('span', { className: 'footer-icon' });
             iconSpan.innerHTML = icons[item.icon] || '';
             link.appendChild(iconSpan);
-            
+
             // Add text
             const textNode = document.createTextNode(item.text);
             link.appendChild(textNode);

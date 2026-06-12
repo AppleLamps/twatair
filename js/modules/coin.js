@@ -12,11 +12,11 @@ export class Coin {
     constructor() {
         this.cryptoTicker = cryptoTicker;
         this.priceHistory = this.generatePriceHistory();
-        
+
         // $TWATAIR token information from centralized config
         this.tokenAddress = TOKEN_CONFIG.address;
-        this.bagsUrl = TOKEN_CONFIG.bagsUrl;
-        
+        this.tradingUrl = TOKEN_CONFIG.tradingUrl;
+
         // API data
         this.tokenData = null;
         this.unsubscribe = null;
@@ -28,13 +28,13 @@ export class Coin {
     async init() {
         await this.createCoinContent();
         this.bindEvents();
-        
+
         // Subscribe to token API updates (primary data source)
         this.unsubscribe = subscribeToTokenUpdates((data) => {
             this.tokenData = data;
             this.updateFromApi(data);
         }, 30000);
-        
+
         // Only use crypto ticker for the ticker bar, not for main price display
         this.cryptoTicker.startUpdates();
 
@@ -52,20 +52,20 @@ export class Coin {
         }
         this.cryptoTicker.destroy();
     }
-    
+
     /**
      * Update display from API data
      * @param {Object} data - Token data from API
      */
     updateFromApi(data) {
         if (!data || !data.token) return;
-        
+
         const token = data.token;
-        
+
         // Update price display
         const priceValue = dom.get('#priceValue');
         const priceChange = dom.get('#priceChange');
-        
+
         if (priceValue) {
             if (token.price && token.price > 0) {
                 priceValue.textContent = format.currency(token.price, '$');
@@ -74,43 +74,43 @@ export class Coin {
                 priceValue.textContent = `${token.priceInSol.toFixed(10)} SOL`;
             }
         }
-        
+
         if (priceChange && typeof token.priceChange24h === 'number') {
             const change = token.priceChange24h;
             priceChange.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
             priceChange.className = 'price-change';
             priceChange.classList.add(change >= 0 ? 'positive' : 'negative');
         }
-        
+
         // Update stats
         const marketCap = dom.get('#marketCap');
         if (marketCap && token.marketCap) {
             marketCap.textContent = format.currency(token.marketCap, '$');
         }
-        
+
         const volume = dom.get('#volume');
         if (volume && token.volume24h) {
             volume.textContent = format.currency(token.volume24h, '$');
         }
-        
+
         const circulating = dom.get('#circulating');
         if (circulating && token.circulatingSupply) {
             circulating.textContent = token.circulatingSupply.toLocaleString();
         }
-        
+
         // Update total supply if available
         const totalSupply = dom.get('#totalSupply');
         if (totalSupply && token.totalSupply) {
             totalSupply.textContent = token.totalSupply.toLocaleString();
         }
-        
+
         // Show API status indicator
         const apiStatus = dom.get('#apiStatus');
         if (apiStatus) {
             apiStatus.textContent = data.mock ? 'DEMO MODE' : 'LIVE';
             apiStatus.className = `api-status ${data.mock ? 'demo' : 'live'}`;
         }
-        
+
         // Store current price for crypto ticker sync
         if (token.price && token.price > 0) {
             this.cryptoTicker.setTwatAirPrice(token.price, token.priceChange24h || 0);
@@ -144,8 +144,8 @@ export class Coin {
             </div>
 
             <div class="coin-actions">
-                <a href="${this.bagsUrl}" target="_blank" rel="noopener" class="btn btn-success" id="buyCoinBtn">
-                    BUY $TWATAIR ON BAGS.FM
+                <a href="${this.tradingUrl}" target="_blank" rel="noopener" class="btn btn-success" id="buyCoinBtn">
+                    BUY $TWATAIR ON PUMP.FUN
                 </a>
             </div>
             
@@ -275,9 +275,9 @@ export class Coin {
         community.innerHTML = `
             <h3>JOIN THE REVOLUTION</h3>
             <div class="community-links">
-                <a href="${this.bagsUrl}" target="_blank" rel="noopener" class="community-link community-link-primary">
-                    <span class="community-icon">BAGS</span>
-                    <span>Trade on Bags.fm</span>
+                <a href="${this.tradingUrl}" target="_blank" rel="noopener" class="community-link community-link-primary">
+                    <span class="community-icon">PUMP</span>
+                    <span>Trade on Pump.fun</span>
                 </a>
                 <a href="#" class="community-link">
                     <span class="community-icon">X</span>

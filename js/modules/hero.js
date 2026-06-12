@@ -84,7 +84,7 @@ export class Hero {
         });
 
         const coinBtn = dom.create('a', {
-            href: this.tokenConfig.bagsUrl,
+            href: this.tokenConfig.tradingUrl,
             className: 'btn hero-btn-secondary',
             textContent: 'BUY $TWATAIR COIN',
             target: '_blank',
@@ -155,7 +155,7 @@ export class Hero {
         const payWithCoin = dom.create('div', { className: 'pay-with-coin' });
         payWithCoin.innerHTML = `
             <p>Or pay with $TWATAIR coin for 50% off!</p>
-            <a href="${this.tokenConfig.bagsUrl}" target="_blank" rel="noopener" class="btn btn-success" id="coin-payment-btn">
+            <a href="${this.tokenConfig.tradingUrl}" target="_blank" rel="noopener" class="btn btn-success" id="coin-payment-btn">
                 ${icons.rocket} PAY WITH $TWATAIR
             </a>
         `;
